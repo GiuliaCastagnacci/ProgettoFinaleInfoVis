@@ -1,0 +1,26 @@
+[
+    { 
+    "center": "Centro 1", 
+    "startDate": "2023-06-01",
+    "endDate": "2023-06-03",
+    "activity": "In esecuzione"
+    },
+    { 
+    "center": "Centro 1", 
+    "startDate": "2023-06-10",
+    "endDate": "2023-06-15",
+    "activity": "In elaborazione"
+    },
+    { 
+    "center": "Centro 2", 
+    "startDate": "2023-06-05",
+    "endDate": "2023-06-08",
+    "activity": "In esecuzione"
+    },
+    {  
+    "center": "Centro 2", 
+    "startDate": "2023-06-18",
+    "endDate": "2023-06-25",
+    "activity": "Richiesta"
+    }
+ ]

@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Diagramma di Gantt - Processo di donazione degli organi</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    .container {
+      display: flex;
+    }
+
+    .form-container {
+      width: 200px;
+      padding: 20px;
+    }
+
+    .chart-container {
+      width: 800px;
+      height: 400px;
+      margin-left: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="form-container">
+      <h3>Attività</h3>
+      <form id="taskForm" onsubmit="handleTaskForm(event)">
+        <label>Data di inizio:</label>
+        <input type="date" id="startDateInput" required><br>
+        <label>Data di fine:</label>
+        <input type="date" id="endDateInput" required><br>
+        <label>Centro:</label>
+        <input type="text" id="centerInput" required><br>
+        <button type="submit" id="addButton">Aggiungi</button>
+        <button type="button" id="editButton" onclick="handleEdit()">Modifica</button>
+        <button type="button" id="deleteButton" onclick="handleDelete()">Elimina</button>
+      </form>
+    </div>
+    <div class="chart-container" id="ganttChart"></div>
+  </div>
+
+  <script>
+    // Dati delle attività
+    var data = [
+      { id: 1, center: "Centro 1", startDate: "2023-06-01", endDate: "2023-06-03", activity: "In esecuzione" },
+      { id: 2, center: "Centro 1", startDate: "2023-06-10", endDate: "2023-06-15", activity: "In elaborazione" },
+      { id: 3, center: "Centro 2", startDate: "2023-06-05", endDate: "2023-06-08", activity: "In esecuzione" },
+      { id: 4, center: "Centro 2", startDate: "2023-06-18", endDate: "2023-06-25", activity: "Richiesta" },
+    ];
+
+    // Dimensioni del grafico
+    var width = 800;
+    var height = 400;
+
+    // Margini del grafico
+    var margin = { top: 20, right: 30, bottom: 50, left: 100 };
+    var innerWidth = width - margin.left - margin.right;
+    var innerHeight = height - margin.top - margin.bottom;
+
+    // Creazione del grafico di Gantt
+    var svg = d3.select("#ganttChart")
+      .append("svg")
+      .attr("width", width)
+      .attr("height", height);
+
+    // Estrai la lista dei centri trapianti
+    var centers = data.map(function(d){ return d.center; });
+    centers = Array.from(new Set(centers));
+
+    // Crea la scala x
+    var xScale = d3.scaleTime()
+      .domain([
+        d3.min(data, function(d) { return new Date(d.startDate); }),
+        d3.max(data, function(d) { return new Date(d.endDate); })
+      ])
+      .range([0, innerWidth]);
+
+    // Crea la scala y
+    var yScale = d3.scaleBand()
+      .domain(centers)
+      .range([0, innerHeight])
+      .padding(0.1);
+
+    // Crea gli assi x e y
+    var xAxis = d3.axisBottom(xScale)
+      .tickFormat(d3.timeFormat("%d"))
+      .tickSize(0)
+      .tickPadding(8);
+    var yAxis = d3.axisLeft(yScale);
+
+    // Raggruppa il grafico all'interno dei margini
+    var g = svg.append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    // Aggiungi l'asse x
+    g.append("g")
+      .attr("class", "x-axis")
+      .attr("transform", "translate(0," + innerHeight + ")")
+      .call(xAxis);
+
+    // Aggiungi l'asse y
+    g.append("g")
+      .attr("class", "y-axis")
+      .call(yAxis);
+
+    // Aggiorna il grafico di Gantt
+    updateGanttChart();
+
+    // Funzione per ottenere il colore dell'attività
+    function getStatusColor(activity) {
+      if (activity === "In esecuzione") {
+        return "green";
+      } else if (activity === "In elaborazione") {
+        return "yellow";
+      } else if (activity === "Richiesta") {
+        return "red";
+      } else {
+        return "gray";
+      }
+    }
+
+    // Funzione per generare un ID univoco
+    function generateId() {
+      return Math.max.apply(Math, data.map(function(d) { return d.id; })) + 1;
+    }
+
+    // Aggiungi/Modifica un'attività
+    function handleTaskForm(event) {
+      event.preventDefault();
+
+      var addButton = document.getElementById("addButton");
+      var editButton = document.getElementById("editButton");
+      var deleteButton = document.getElementById("deleteButton");
+      var idInput = document.getElementById("idInput");
+      var startDateInput = document.getElementById("startDateInput");
+      var endDateInput = document.getElementById("endDateInput");
+      var centerInput = document.getElementById("centerInput");
+
+      var id = parseInt(idInput.value);
+      var startDate = startDateInput.value;
+      var endDate = endDateInput.value;
+      var center = centerInput.value;
+
+      if (addButton.style.display === "inline-block") {
+        // Aggiungi un'attività
+        var newTask = {
+          id: generateId(),
+          center: center,
+          startDate: startDate,
+          endDate: endDate,
+          activity: "Nuova attività"
+        };
+
+        data.push(newTask);
+      } else if (editButton.style.display === "inline-block") {
+        // Modifica un'attività
+        var existingTask = data.find(function(d) {
+          return d.id === id;
+        });
+
+        if (existingTask) {
+          existingTask.startDate = startDate;
+          existingTask.endDate = endDate;
+          existingTask.center = center;
+        }
+      }
+
+      // Aggiorna il grafico di Gantt
+      updateGanttChart();
+
+      // Resetta il modulo
+      idInput.value = "";
+      startDateInput.value= "";
+      endDateInput.value = "";
+      centerInput.value = "";
+
+      // Mostra il pulsante "Aggiungi" e nascondi "Modifica" e "Elimina"
+      addButton.style.display = "inline-block";
+      editButton.style.display = "none";
+      deleteButton.style.display = "none";
+    }
+
+    // Modifica un'attività
+    function handleEdit() {
+      var addButton = document.getElementById("addButton");
+      var editButton = document.getElementById("editButton");
+      var deleteButton = document.getElementById("deleteButton");
+      var idInput = document.getElementById("idInput");
+      var startDateInput = document.getElementById("startDateInput");
+      var endDateInput = document.getElementById("endDateInput");
+      var centerInput = document.getElementById("centerInput");
+
+      var selectedTask = data.find(function(d) {
+        return d.id === parseInt(idInput.value);
+      });
+
+      if (selectedTask) {
+        // Popola i campi del modulo con i valori dell'attività selezionata
+        startDateInput.value = selectedTask.startDate;
+        endDateInput.value = selectedTask.endDate;
+        centerInput.value = selectedTask.center;
+
+        // Mostra il pulsante "Modifica" e nascondi "Aggiungi" e "Elimina"
+        addButton.style.display = "none";
+        editButton.style.display = "inline-block";
+        deleteButton.style.display = "none";
+      }
+    }
+
+    // Elimina un'attività
+    function handleDelete() {
+      var addButton = document.getElementById("addButton");
+      var editButton = document.getElementById("editButton");
+      var deleteButton = document.getElementById("deleteButton");
+      var idInput = document.getElementById("idInput");
+      var startDateInput = document.getElementById("startDateInput");
+      var endDateInput = document.getElementById("endDateInput");
+      var centerInput = document.getElementById("centerInput");
+
+      var selectedTask = data.find(function(d) {
+        return d.id === parseInt(idInput.value);
+      });
+
+      if (selectedTask) {
+        // Rimuovi l'attività dalla lista
+        var index = data.indexOf(selectedTask);
+        data.splice(index, 1);
+
+        // Aggiorna il grafico di Gantt
+        updateGanttChart();
+
+        // Resetta il modulo
+        idInput.value = "";
+        startDateInput.value = "";
+        endDateInput.value = "";
+        centerInput.value = "";
+
+        // Mostra il pulsante "Aggiungi" e nascondi "Modifica" e "Elimina"
+        addButton.style.display = "inline-block";
+        editButton.style.display = "none";
+        deleteButton.style.display = "none";
+      }
+    }
+
+    // Aggiorna il grafico di Gantt
+    function updateGanttChart() {
+      // Aggiorna la scala x
+      xScale.domain([
+        d3.min(data, function(d) { return new Date(d.startDate); }),
+        d3.max(data, function(d) { return new Date(d.endDate); })
+      ]);
+
+      // Aggiorna l'asse x
+      svg.select(".x-axis")
+        .transition()
+        .duration(500)
+        .call(xAxis);
+
+      // Aggiorna le barre delle attività
+      var bars = g.selectAll(".bar")
+        .data(data, function(d) { return d.id; });
+
+      bars.enter()
+        .append("rect")
+        .attr("class", "bar")
+        .merge(bars)
+        .attr("x", function(d) { return xScale(new Date(d.startDate)); })
+        .attr("y", function(d) { return yScale(d.center); })
+        .attr("width", function(d) { return xScale(new Date(d.endDate)) - xScale(new Date(d.startDate)); })
+        .attr("height", yScale.bandwidth())
+        .attr("fill", function(d) { return getStatusColor(d.activity); })
+        .on("contextmenu", function(d) {
+          d3.event.preventDefault();
+          editTask(d);
+        })
+        .on("dblclick", function(d) {
+          d3.event.preventDefault();
+          deleteTask(d);
+        });
+
+      bars.exit().remove();
+
+      // Aggiorna le etichette delle attività
+      var labels = g.selectAll(".label")
+        .data(data, function(d) { return d.id; });
+
+      labels.enter()
+        .append("text")
+        .attr("class", "label")
+        .merge(labels)
+        .attr("x", function(d) { return xScale(new Date(d.startDate)) + 5; })
+        .attr("y", function(d) { return yScale(d.center) + yScale.bandwidth() / 2 + 5; })
+        .text(function(d) { return d.activity; });
+
+      labels.exit().remove();
+    }
+
+    // Funzione per visualizzare il modulo di modifica
+    function editTask(task) {
+      var addButton = document.getElementById("addButton");
+      var editButton = document.getElementById("editButton");
+      var deleteButton = document.getElementById("deleteButton");
+      var idInput = document.getElementById("idInput");
+      var startDateInput = document.getElementById("startDateInput");
+      var endDateInput = document.getElementById("endDateInput");
+      var centerInput = document.getElementById("centerInput");
+
+      // Popola i campi del modulo con i valori dell'attività selezionata
+      idInput.value = task.id;
+      startDateInput.value = task.startDate;
+      endDateInput.value = task.endDate;
+      centerInput.value = task.center;
+
+      // Mostra il pulsante "Modifica" e nascondi "Aggiungi" e "Elimina"
+      addButton.style.display = "none";
+      editButton.style.display = "inline-block";
+      deleteButton.style.display = "none";
+    }
+
+    // Funzione per visualizzare il modulo di eliminazione
+    function deleteTask(task) {
+      var addButton = document.getElementById("addButton");
+      var editButton = document.getElementById("editButton");
+      var deleteButton = document.getElementById("deleteButton");
+      var idInput = document.getElementById("idInput");
+      var startDateInput = document.getElementById("startDateInput");
+      var endDateInput = document.getElementById("endDateInput");
+      var centerInput = document.getElementById("centerInput");
+
+      // Popola i campi del modulo con i valori dell'attività selezionata
+      idInput.value = task.id;
+      startDateInput.value = task.startDate;
+      endDateInput.value = task.endDate;
+      centerInput.value = task.center;
+
+      // Mostra il pulsante "Elimina" e nascondi "Aggiungi" e "Modifica"
+      addButton.style.display = "none";
+      editButton.style.display = "none";
+      deleteButton.style.display = "inline-block";
+    }
+  </script>
+</body>
+</html>
+
