@@ -23,30 +23,51 @@
 <body>
   <div class="container">
     <div class="form-container">
-      <h3>Attività</h3>
-      <form id="taskForm" onsubmit="handleTaskForm(event)">
+      <h3>Inserisci un'attività</h3>
+      <form onsubmit="addTask(event)">
         <label>Data di inizio:</label>
         <input type="date" id="startDateInput" required><br>
         <label>Data di fine:</label>
         <input type="date" id="endDateInput" required><br>
+        <label>Tipo di attività:</label>
+        <input type="text" id="activityInput" required><br>
         <label>Centro:</label>
         <input type="text" id="centerInput" required><br>
-        <button type="submit" id="addButton">Aggiungi</button>
-        <button type="button" id="editButton" onclick="handleEdit()">Modifica</button>
-        <button type="button" id="deleteButton" onclick="handleDelete()">Elimina</button>
+        <button type="submit">Aggiungi</button>
       </form>
     </div>
     <div class="chart-container" id="ganttChart"></div>
   </div>
 
   <script>
-    // Dati delle attività
-    var data = [
-      { id: 1, center: "Centro 1", startDate: "2023-06-01", endDate: "2023-06-03", activity: "In esecuzione" },
-      { id: 2, center: "Centro 1", startDate: "2023-06-10", endDate: "2023-06-15", activity: "In elaborazione" },
-      { id: 3, center: "Centro 2", startDate: "2023-06-05", endDate: "2023-06-08", activity: "In esecuzione" },
-      { id: 4, center: "Centro 2", startDate: "2023-06-18", endDate: "2023-06-25", activity: "Richiesta" },
-    ];
+    var data = [];
+
+    // Carica i dati da un file JSON
+function loadDataFromJSON() {
+  d3.json("data.json").then(function(jsonData) {
+    data = jsonData;
+    updateGanttChart();
+  }).catch(function(error) {
+    console.log("Errore nel caricamento dei dati da JSON:", error);
+  });
+}
+
+
+        function saveDataToJSON() {
+  var jsonData = JSON.stringify(data, null, 2);
+
+  var blob = new Blob([jsonData], { type: "application/json" });
+  var url = URL.createObjectURL(blob);
+
+  var a = document.createElement("a");
+  a.href = url;
+  a.download = "data.json";
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+
+  loadDataFromJSON();
 
     // Dimensioni del grafico
     var width = 800;
@@ -63,9 +84,9 @@
       .attr("width", width)
       .attr("height", height);
 
-    // Estrai la lista dei centri trapianti
-    var centers = data.map(function(d){ return d.center; });
-    centers = Array.from(new Set(centers));
+    // Estrai la lista dei centri trapianti organi
+    var centers = data.map(function(d) { return d.center; });
+    centers = Array.from(new Set(centers)); // Rimuovi i duplicati
 
     // Crea la scala x
     var xScale = d3.scaleTime()
@@ -103,8 +124,103 @@
       .attr("class", "y-axis")
       .call(yAxis);
 
-    // Aggiorna il grafico di Gantt
-    updateGanttChart();
+    // Aggiungi le barre delle attività
+    var bars = g.selectAll(".bar")
+      .data(data)
+      .enter()
+      .append("rect")
+      .attr("class", "bar")
+      .attr("x", function(d) { return xScale(new Date(d.startDate)); })
+      .attr("y", function(d) { return yScale(d.center); })
+      .attr("width", function(d) { return xScale(new Date(d.endDate)) - xScale(new Date(d.startDate)); })
+      .attr("height", yScale.bandwidth())
+      .attr("fill", function(d) { return getStatusColor(d.activity); });
+
+    // Aggiungi etichette delle attività
+    g.selectAll(".label")
+      .data(data)
+      .enter()
+      .append("text")
+      .attr("class", "label")
+      .attr("x", function(d) { return xScale(new Date(d.startDate)) + 5; })
+      .attr("y", function(d) { return yScale(d.center) + yScale.bandwidth() / 2 + 5; })
+      .text(function(d) { return d.activity; });
+// Aggiorna il grafico di Gantt
+    function updateGanttChart() {
+  // Crea la scala x
+  xScale.domain([
+    d3.min(data, function(d) { return new Date(d.startDate); }),
+    d3.max(data, function(d) { return new Date(d.endDate); })
+  ]);
+
+  // Aggiorna l'asse x
+  svg.select(".x-axis")
+    .transition()
+    .duration(500)
+    .call(xAxis);
+
+  // Aggiorna le barre delle attività
+  bars = g.selectAll(".bar")
+    .data(data);
+
+  bars.enter()
+    .append("rect")
+    .attr("class", "bar")
+    .merge(bars)
+    .attr("x", function(d) { return xScale(new Date(d.startDate)); })
+    .attr("y", function(d) { return yScale(d.center); })
+    .attr("width", function(d) { return xScale(new Date(d.endDate)) - xScale(new Date(d.startDate)); })
+    .attr("height", yScale.bandwidth())
+    .attr("fill", function(d) { return getStatusColor(d.activity); });
+
+  bars.exit().remove();
+
+  // Aggiorna le etichette delle attività
+  var labels = g.selectAll(".label")
+    .data(data);
+
+  labels.enter()
+    .append("text")
+    .attr("class", "label")
+    .merge(labels)
+    .attr("x", function(d) { return xScale(new Date(d.startDate)) + 5; })
+    .attr("y", function(d) { return yScale(d.center) + yScale.bandwidth() / 2 + 5; })
+    .text(function(d) { return d.activity; });
+
+  labels.exit().remove();
+  saveDataToJSON();
+}
+
+
+    // Aggiungi un'attività
+    function addTask(event) {
+      event.preventDefault();
+
+      var startDateInput = document.getElementById('startDateInput');
+      var endDateInput = document.getElementById('endDateInput');
+      var activityInput = document.getElementById('activityInput');
+      var centerInput = document.getElementById('centerInput');
+
+      var task = {
+        center: centerInput.value,
+        startDate: startDateInput.value,
+        endDate: endDateInput.value,
+        activity: activityInput.value
+      };
+
+      data.push(task);
+
+      // Aggiorna il grafico di Gantt
+      updateGanttChart();
+
+      // Resetta i campi di input
+      startDateInput.value = '';
+      endDateInput.value = '';
+      activityInput.value = '';
+      centerInput.value = '';
+
+      //saveDataToJSON();
+    }
 
     // Funzione per ottenere il colore dell'attività
     function getStatusColor(activity) {
@@ -119,226 +235,8 @@
       }
     }
 
-    // Funzione per generare un ID univoco
-    function generateId() {
-      return Math.max.apply(Math, data.map(function(d) { return d.id; })) + 1;
-    }
 
-    // Aggiungi/Modifica un'attività
-    function handleTaskForm(event) {
-      event.preventDefault();
 
-      var addButton = document.getElementById("addButton");
-      var editButton = document.getElementById("editButton");
-      var deleteButton = document.getElementById("deleteButton");
-      var idInput = document.getElementById("idInput");
-      var startDateInput = document.getElementById("startDateInput");
-      var endDateInput = document.getElementById("endDateInput");
-      var centerInput = document.getElementById("centerInput");
-
-      var id = parseInt(idInput.value);
-      var startDate = startDateInput.value;
-      var endDate = endDateInput.value;
-      var center = centerInput.value;
-
-      if (addButton.style.display === "inline-block") {
-        // Aggiungi un'attività
-        var newTask = {
-          id: generateId(),
-          center: center,
-          startDate: startDate,
-          endDate: endDate,
-          activity: "Nuova attività"
-        };
-
-        data.push(newTask);
-      } else if (editButton.style.display === "inline-block") {
-        // Modifica un'attività
-        var existingTask = data.find(function(d) {
-          return d.id === id;
-        });
-
-        if (existingTask) {
-          existingTask.startDate = startDate;
-          existingTask.endDate = endDate;
-          existingTask.center = center;
-        }
-      }
-
-      // Aggiorna il grafico di Gantt
-      updateGanttChart();
-
-      // Resetta il modulo
-      idInput.value = "";
-      startDateInput.value= "";
-      endDateInput.value = "";
-      centerInput.value = "";
-
-      // Mostra il pulsante "Aggiungi" e nascondi "Modifica" e "Elimina"
-      addButton.style.display = "inline-block";
-      editButton.style.display = "none";
-      deleteButton.style.display = "none";
-    }
-
-    // Modifica un'attività
-    function handleEdit() {
-      var addButton = document.getElementById("addButton");
-      var editButton = document.getElementById("editButton");
-      var deleteButton = document.getElementById("deleteButton");
-      var idInput = document.getElementById("idInput");
-      var startDateInput = document.getElementById("startDateInput");
-      var endDateInput = document.getElementById("endDateInput");
-      var centerInput = document.getElementById("centerInput");
-
-      var selectedTask = data.find(function(d) {
-        return d.id === parseInt(idInput.value);
-      });
-
-      if (selectedTask) {
-        // Popola i campi del modulo con i valori dell'attività selezionata
-        startDateInput.value = selectedTask.startDate;
-        endDateInput.value = selectedTask.endDate;
-        centerInput.value = selectedTask.center;
-
-        // Mostra il pulsante "Modifica" e nascondi "Aggiungi" e "Elimina"
-        addButton.style.display = "none";
-        editButton.style.display = "inline-block";
-        deleteButton.style.display = "none";
-      }
-    }
-
-    // Elimina un'attività
-    function handleDelete() {
-      var addButton = document.getElementById("addButton");
-      var editButton = document.getElementById("editButton");
-      var deleteButton = document.getElementById("deleteButton");
-      var idInput = document.getElementById("idInput");
-      var startDateInput = document.getElementById("startDateInput");
-      var endDateInput = document.getElementById("endDateInput");
-      var centerInput = document.getElementById("centerInput");
-
-      var selectedTask = data.find(function(d) {
-        return d.id === parseInt(idInput.value);
-      });
-
-      if (selectedTask) {
-        // Rimuovi l'attività dalla lista
-        var index = data.indexOf(selectedTask);
-        data.splice(index, 1);
-
-        // Aggiorna il grafico di Gantt
-        updateGanttChart();
-
-        // Resetta il modulo
-        idInput.value = "";
-        startDateInput.value = "";
-        endDateInput.value = "";
-        centerInput.value = "";
-
-        // Mostra il pulsante "Aggiungi" e nascondi "Modifica" e "Elimina"
-        addButton.style.display = "inline-block";
-        editButton.style.display = "none";
-        deleteButton.style.display = "none";
-      }
-    }
-
-    // Aggiorna il grafico di Gantt
-    function updateGanttChart() {
-      // Aggiorna la scala x
-      xScale.domain([
-        d3.min(data, function(d) { return new Date(d.startDate); }),
-        d3.max(data, function(d) { return new Date(d.endDate); })
-      ]);
-
-      // Aggiorna l'asse x
-      svg.select(".x-axis")
-        .transition()
-        .duration(500)
-        .call(xAxis);
-
-      // Aggiorna le barre delle attività
-      var bars = g.selectAll(".bar")
-        .data(data, function(d) { return d.id; });
-
-      bars.enter()
-        .append("rect")
-        .attr("class", "bar")
-        .merge(bars)
-        .attr("x", function(d) { return xScale(new Date(d.startDate)); })
-        .attr("y", function(d) { return yScale(d.center); })
-        .attr("width", function(d) { return xScale(new Date(d.endDate)) - xScale(new Date(d.startDate)); })
-        .attr("height", yScale.bandwidth())
-        .attr("fill", function(d) { return getStatusColor(d.activity); })
-        .on("contextmenu", function(d) {
-          d3.event.preventDefault();
-          editTask(d);
-        })
-        .on("dblclick", function(d) {
-          d3.event.preventDefault();
-          deleteTask(d);
-        });
-
-      bars.exit().remove();
-
-      // Aggiorna le etichette delle attività
-      var labels = g.selectAll(".label")
-        .data(data, function(d) { return d.id; });
-
-      labels.enter()
-        .append("text")
-        .attr("class", "label")
-        .merge(labels)
-        .attr("x", function(d) { return xScale(new Date(d.startDate)) + 5; })
-        .attr("y", function(d) { return yScale(d.center) + yScale.bandwidth() / 2 + 5; })
-        .text(function(d) { return d.activity; });
-
-      labels.exit().remove();
-    }
-
-    // Funzione per visualizzare il modulo di modifica
-    function editTask(task) {
-      var addButton = document.getElementById("addButton");
-      var editButton = document.getElementById("editButton");
-      var deleteButton = document.getElementById("deleteButton");
-      var idInput = document.getElementById("idInput");
-      var startDateInput = document.getElementById("startDateInput");
-      var endDateInput = document.getElementById("endDateInput");
-      var centerInput = document.getElementById("centerInput");
-
-      // Popola i campi del modulo con i valori dell'attività selezionata
-      idInput.value = task.id;
-      startDateInput.value = task.startDate;
-      endDateInput.value = task.endDate;
-      centerInput.value = task.center;
-
-      // Mostra il pulsante "Modifica" e nascondi "Aggiungi" e "Elimina"
-      addButton.style.display = "none";
-      editButton.style.display = "inline-block";
-      deleteButton.style.display = "none";
-    }
-
-    // Funzione per visualizzare il modulo di eliminazione
-    function deleteTask(task) {
-      var addButton = document.getElementById("addButton");
-      var editButton = document.getElementById("editButton");
-      var deleteButton = document.getElementById("deleteButton");
-      var idInput = document.getElementById("idInput");
-      var startDateInput = document.getElementById("startDateInput");
-      var endDateInput = document.getElementById("endDateInput");
-      var centerInput = document.getElementById("centerInput");
-
-      // Popola i campi del modulo con i valori dell'attività selezionata
-      idInput.value = task.id;
-      startDateInput.value = task.startDate;
-      endDateInput.value = task.endDate;
-      centerInput.value = task.center;
-
-      // Mostra il pulsante "Elimina" e nascondi "Aggiungi" e "Modifica"
-      addButton.style.display = "none";
-      editButton.style.display = "none";
-      deleteButton.style.display = "inline-block";
-    }
   </script>
 </body>
 </html>
-
