@@ -1,10 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <!DOCTYPE html>
-<html>
-<head>
-  <title>Diagramma di Gantt - Processo di donazione degli organi</title>
+  <title>Donazione degli organi</title>
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <style>
     .container {
@@ -26,72 +23,60 @@
 <body>
   <div class="container">
     <div class="form-container">
-      <h3>Aggiungi un'attività</h3>
-      <form id="addTaskForm" onsubmit="handleAddTaskForm(event)">
+      <h3>Inserisci un'attività</h3>
+      <form onsubmit="addTask(event)">
         <label>Data di inizio:</label>
-        <input type="date" id="addStartDateInput" required><br>
+        <input type="date" id="startDateInput" required><br>
         <label>Data di fine:</label>
-        <input type="date" id="addEndDateInput" required><br>
+        <input type="date" id="endDateInput" required><br>
         <label>Tipo di attività:</label>
-        <input type="text" id="addActivityInput" required><br>
+        <select id="activitySelect" required>
+          <option value="In esecuzione">In esecuzione</option>
+          <option value="In elaborazione">In elaborazione</option>
+          <option value="Richiesta">Richiesta</option>
+        </select><br>
         <label>Centro:</label>
-        <input type="text" id="addCenterInput" required><br>
+        <select id="centerSelect" required>
+          <option value="Centro 1">Centro 1</option>
+          <option value="Centro 2">Centro 2</option>
+          <option value="Centro 3">Centro 3</option>
+        </select><br>
+        <label>Id:</label>
+        <input type="text" id="idInput" required><br>
         <button type="submit">Aggiungi</button>
       </form>
-      <h3>Modifica un'attività</h3>
-      <form id="editTaskForm" onsubmit="handleEditTaskForm(event)">
-        <label>ID:</label>
-        <input type="text" id="editIdInput" required><br>
-        <label>Data di inizio:</label>
-        <input type="date" id="editStartDateInput" required><br>
-        <label>Data di fine:</label>
-        <input type="date" id="editEndDateInput" required><br>
-        <label>Tipo di attività:</label>
-        <input type="text" id="editActivityInput" required><br>
-        <label>Centro:</label>
-        <input type="text" id="editCenterInput" required><br>
-        <button type="submit">Modifica</button>
-      </form>
-      <h3>Elimina un'attività</h3>
-      <form id="deleteTaskForm" onsubmit="handleDeleteTaskForm(event)">
-        <label>ID:</label>
-        <input type="text" id="deleteIdInput" required><br>
-        <button type="submit">Elimina</button>
-      </form>
+      <button onclick="editTask()">Modifica</button>
+      <button onclick="deleteTask()">Elimina</button>
     </div>
     <div class="chart-container" id="ganttChart"></div>
   </div>
 
   <script>
+    var data = [];
 
+    // Carica i dati da un file JSON
+    function loadDataFromJSON() {
+      d3.json("data.json").then(function(jsonData) {
+        data = jsonData;
+        updateGanttChart();
+      }).catch(function(error) {
+        console.log("Errore nel caricamento dei dati da JSON:", error);
+      });
+    }
 
+    function saveDataToJSON() {
+      var jsonData = JSON.stringify(data, null, 2);
 
+      var blob = new Blob([jsonData], { type: "application/json" });
+      var url = URL.createObjectURL(blob);
 
+      var a = document.createElement("a");
+      a.href = url;
+      a.download = "data.json";
+      a.click();
 
-          function saveDataToJSON() {
-  var jsonData = JSON.stringify(data, null, 2);
-
-  var blob = new Blob([jsonData], { type: "application/json" });
-  var url = URL.createObjectURL(blob);
-
-  var a = document.createElement("a");
-  a.href = url;
-  a.download = "data.json";
-  a.click();
-
-  URL.revokeObjectURL(url);
-}
-
-
-
-
-    // Dati delle attività
-    var data = [
-      { id: 1, center: "Centro 1", startDate: "2023-06-01", endDate: "2023-06-03", activity: "In esecuzione" },
-      { id: 2, center: "Centro 1", startDate: "2023-06-10", endDate: "2023-06-15", activity: "In elaborazione" },
-      { id: 3, center: "Centro 2", startDate: "2023-06-05", endDate: "2023-06-08", activity: "In esecuzione" },
-      { id: 4, center: "Centro2", startDate: "2023-06-18", endDate: "2023-06-25", activity: "Richiesta" },
-    ];
+      URL.revokeObjectURL(url);
+    }
 
     // Dimensioni del grafico
     var width = 800;
@@ -106,23 +91,14 @@
     var svg = d3.select("#ganttChart")
       .append("svg")
       .attr("width", width)
-      .attr("height", height);
-
-    // Estrai la lista dei centri trapianti
-    var centers = data.map(function(d) { return d.center; });
-    centers = Array.from(new Set(centers));
+      .attr("height",height);
 
     // Crea la scala x
     var xScale = d3.scaleTime()
-      .domain([
-        d3.min(data, function(d) { return new Date(d.startDate); }),
-        d3.max(data, function(d) { return new Date(d.endDate); })
-      ])
       .range([0, innerWidth]);
 
     // Crea la scala y
     var yScale = d3.scaleBand()
-      .domain(centers)
       .range([0, innerHeight])
       .padding(0.1);
 
@@ -135,7 +111,7 @@
 
     // Raggruppa il grafico all'interno dei margini
     var g = svg.append("g")
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     // Aggiungi l'asse x
     g.append("g")
@@ -149,120 +125,19 @@
       .call(yAxis);
 
     // Aggiorna il grafico di Gantt
-    updateGanttChart();
-
-    // Funzione per ottenere il colore dell'attività
-    function getStatusColor(activity) {
-      if (activity === "In esecuzione") {
-        return "green";
-      } else if (activity === "In elaborazione") {
-        return "yellow";
-      } else if (activity === "Richiesta") {
-        return "red";
-      } else {
-        return "gray";
-      }
-    }
-
-    // Funzione per generare un ID univoco
-    function generateId() {
-      return Math.max.apply(Math, data.map(function(d) { return d.id; })) + 1;
-    }
-
-    // Aggiungi un'attività
-    function handleAddTaskForm(event) {
-      event.preventDefault();
-
-      var startDateInput = document.getElementById("addStartDateInput");
-      var endDateInput = document.getElementById("addEndDateInput");
-      var activityInput = document.getElementById("addActivityInput");
-      var centerInput = document.getElementById("addCenterInput");
-
-      var startDate = startDateInput.value;
-      var endDate = endDateInput.value;
-      var activity = activityInput.value;
-      var center = centerInput.value;
-
-      var newTask = {
-        id: generateId(),
-        center: center,
-        startDate: startDate,
-        endDate: endDate,
-        activity:activity
-      };
-
-      data.push(newTask);
-
-      // Aggiorna il grafico di Gantt
-      updateGanttChart();
-
-      // Resetta il modulo
-      event.target.reset();
-    }
-
-    // Modifica un'attività
-    function handleEditTaskForm(event) {
-      event.preventDefault();
-
-      var idInput = document.getElementById("editIdInput");
-      var startDateInput = document.getElementById("editStartDateInput");
-      var endDateInput = document.getElementById("editEndDateInput");
-      var activityInput = document.getElementById("editActivityInput");
-      var centerInput = document.getElementById("editCenterInput");
-
-      var id = parseInt(idInput.value);
-      var startDate = startDateInput.value;
-      var endDate = endDateInput.value;
-      var activity = activityInput.value;
-      var center = centerInput.value;
-
-      var existingTask = data.find(function(d) {
-        return d.id === id;
-      });
-
-      if (existingTask) {
-        existingTask.startDate = startDate;
-        existingTask.endDate = endDate;
-        existingTask.activity = activity;
-        existingTask.center = center;
-
-        // Aggiorna il grafico di Gantt
-        updateGanttChart();
-      }
-
-      // Resetta il modulo
-      event.target.reset();
-    }
-
-    // Elimina un'attività
-    function handleDeleteTaskForm(event) {
-      event.preventDefault();
-
-      var idInput = document.getElementById("deleteIdInput");
-      var id = parseInt(idInput.value);
-
-      var taskIndex = data.findIndex(function(d) {
-        return d.id === id;
-      });
-
-      if (taskIndex !== -1) {
-        data.splice(taskIndex, 1);
-
-        // Aggiorna il grafico di Gantt
-        updateGanttChart();
-      }
-
-      // Resetta il modulo
-      event.target.reset();
-    }
-
-    // Aggiorna il grafico di Gantt
     function updateGanttChart() {
-      // Aggiorna la scala x
+      // Estrai la lista dei centri trapianti organi
+      var centers = data.map(function(d) { return d.center; });
+      centers = Array.from(new Set(centers)); // Rimuovi i duplicati
+
+      // Crea la scala x
       xScale.domain([
         d3.min(data, function(d) { return new Date(d.startDate); }),
         d3.max(data, function(d) { return new Date(d.endDate); })
       ]);
+
+      // Crea la scala y
+      yScale.domain(centers);
 
       // Aggiorna l'asse x
       svg.select(".x-axis")
@@ -270,9 +145,15 @@
         .duration(500)
         .call(xAxis);
 
+      // Aggiorna l'asse y
+      svg.select(".y-axis")
+        .transition()
+        .duration(500)
+        .call(yAxis);
+
       // Aggiorna le barre delle attività
       var bars = g.selectAll(".bar")
-        .data(data, function(d) { return d.id; });
+        .data(data, function(d, i) { return i; });
 
       bars.enter()
         .append("rect")
@@ -283,14 +164,138 @@
         .attr("width", function(d) { return xScale(new Date(d.endDate)) - xScale(new Date(d.startDate)); })
         .attr("height", yScale.bandwidth())
         .attr("fill", function(d) { return getStatusColor(d.activity); })
-        .on("click", function(d) { editTaskForm(d.id); });
+        .attr("data-id", function(d, i) { return i; }); // Aggiungi l'attributo data-id con l'indice dell'attività
 
       bars.exit().remove();
+
+      // Aggiorna le etichette delle attività
+      var labels = g.selectAll(".label")
+        .data(data, function(d, i) { return i; });
+
+      labels.enter()
+        .append("text")
+        .attr("class", "label")
+        .merge(labels)
+        .attr("x", function(d) { return xScale(new Date(d.startDate)) + 5; })
+        .attr("y", function(d) { return yScale(d.center) + yScale.bandwidth() / 2 + 5; })
+        .text(function(d, i) { return i + ": " + ": " + d.activity; }); // Mostra l'indice dell'attività
+
+      labels.exit().remove();
+    }
+
+    // Aggiungi un'attività
+    function addTask(event) {
+      event.preventDefault();
+
+      var startDateInput = document.getElementById('startDateInput');
+      var endDateInput = document.getElementById('endDateInput');
+      var activitySelect = document.getElementById('activitySelect');
+      var centerSelect = document.getElementById('centerSelect');
+      var idInput = document.getElementById('idInput');
+
+      var task = {
+        center: centerSelect.value,
+        startDate: startDateInput.value,
+        endDate: endDateInput.value,
+        activity: activitySelect.value
+      };
+
+      var id = parseInt(idInput.value, 10);
+      if (!isNaN(id) && id >= 0 && id < data.length) {
+        // Modifica l'attività esistente
+        data[id] = task;
+      } else {
+        // Aggiungi una nuova attività
+        data.push(task);
+      }
+
+      // Aggiorna il grafico di Gantt
+      updateGanttChart();
+
+      // Resetta i campi di input
+      startDateInput.value = '';
+      endDateInput.value = '';
+      idInput.value = '';
+
+      // Salva i dati nel file JSON
       saveDataToJSON();
     }
 
+    // Modifica un'attività
+    function editTask() {
+      var idInput = document.getElementById('idInput');
+      var id = parseInt(idInput.value, 10);
 
-    loadDataFromJSON();
+      if (!isNaN(id) && id >= 0 && id < data.length) {
+        var selectedTask = data[id];
+
+        var startDateInput = document.getElementById('startDateInput');
+        var endDateInput = document.getElementById('endDateInput');
+        var activitySelect = document.getElementById('activitySelect');
+        var centerSelect = document.getElementById('centerSelect');
+
+        selectedTask.startDate = startDateInput.value;
+        selectedTask.endDate = endDateInput.value;
+        selectedTask.activity = activitySelect.value;
+        selectedTask.center = centerSelect.value;
+
+        // Aggiorna l'attività aggiornata nell'array dei dati
+        data[id] = selectedTask;
+
+        // Aggiorna il grafico di Gantt
+        updateGanttChart();
+
+        // Resetta i campi di input
+        startDateInput.value = '';
+        endDateInput.value = '';
+        idInput.value = '';
+
+        // Salva i dati nel file JSON
+        saveDataToJSON();
+      } else {
+        alert("Id non valido!");
+      }
+    }
+
+    // Elimina un'attività
+    function deleteTask() {
+      var idInput = document.getElementById('idInput');
+      var id = parseInt(idInput.value, 10);
+
+      if (!isNaN(id) && id >= 0 && id < data.length) {
+        data.splice(id, 1); // Rimuovi l'attività dall'array dei dati
+
+        // Aggiorna il grafico di Gantt
+        updateGanttChart();
+
+        // Resetta i campi di input
+        idInput.value = '';
+
+        // Salva i dati nel file JSON
+        saveDataToJSON();
+      } else {
+        alert("Id non valido!");
+      }
+    }
+
+    // Funzione per ottenere il colore dello stato dell'attività
+    function getStatusColor(status) {
+      // Codice per ottenere il colore in base allo stato dell'attività
+      if (status === "In esecuzione") {
+        return "green";
+      } else if (status === "In elaborazione") {
+        return "orange";
+      } else if (status === "Richiesta") {
+        return "blue";
+      } else {
+        return "gray";
+      }
+    }
+
+    // Carica i dati al caricamento della pagina
+    window.addEventListener('DOMContentLoaded', function() {
+      loadDataFromJSON();
+    });
   </script>
 </body>
 </html>
