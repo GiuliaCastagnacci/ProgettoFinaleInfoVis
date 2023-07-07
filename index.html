@@ -201,70 +201,73 @@ legendItem.append("text")
   .attr("y", 8)
   .text(function(d) { return d.label; });
 
-    // Aggiungi un'attività
-  function addTask(event) {
-    event.preventDefault();
+  // Aggiungi un'attività
+function addTask(event) {
+  event.preventDefault();
 
-    var startDateInput = document.getElementById('startDateInput');
-    var endDateInput = document.getElementById('endDateInput');
-    var activitySelect = document.getElementById('activitySelect');
-    var centerSelect = document.getElementById('centerSelect');
-    var idInput = document.getElementById('idInput');
+  var startDateInput = document.getElementById('startDateInput');
+  var endDateInput = document.getElementById('endDateInput');
+  var activitySelect = document.getElementById('activitySelect');
+  var centerSelect = document.getElementById('centerSelect');
+  var idInput = document.getElementById('idInput');
 
-    var startDate = new Date(startDateInput.value);
-    var endDate = new Date(endDateInput.value);
+  var startDate = new Date(startDateInput.value);
+  var endDate = new Date(endDateInput.value);
 
-    // Verifica se lo slot temporale è già occupato per il centro selezionato
-    var isSlotOccupied = data.some(function(task) {
-      var taskStartDate = new Date(task.startDate);
-      var taskEndDate = new Date(task.endDate);
-
-      return (
-        task.center === centerSelect.value &&
-        (
-          (startDate >= taskStartDate && startDate <= taskEndDate) ||
-          (endDate >= taskStartDate && endDate <= taskEndDate) ||
-          (startDate <= taskStartDate && endDate >= taskEndDate)
-        )
-      );
-    });
-
-    if (isSlotOccupied) {
-      alert("Slot temporale occupato per il centro selezionato");
-      return; // Esce dalla funzione senza aggiungere l'attività
-    }
-
-    var task = {
-      center: centerSelect.value,
-      startDate: startDateInput.value,
-      endDate: endDateInput.value,
-      activity: activitySelect.value
-    };
-
-    var id = parseInt(idInput.value, 10);
-    if (!isNaN(id) && id >= 0 && id < data.length) {
-      // Modifica l'attività esistente
-      data[id] = task;
-    } else {
-      // Aggiungi una nuova attività
-      data.push(task);
-    }
-
-    // Aggiorna il grafico di Gantt
-    updateGanttChart();
-
-    // Resetta i campi di input
-    startDateInput.value = '';
-    endDateInput.value = '';
-    idInput.value = '';
-
-    // Salva i dati nel file JSON
-    //saveDataToJSON();
+  if (startDate > endDate) {
+    alert("La data di inizio deve essere precedente alla data di fine.");
+    return; // Esce dalla funzione senza aggiungere l'attività
   }
 
+  // Verifica se lo slot temporale è già occupato per il centro selezionato
+  var isSlotOccupied = data.some(function(task) {
+    var taskStartDate = new Date(task.startDate);
+    var taskEndDate = new Date(task.endDate);
 
+    return (
+      task.center === centerSelect.value &&
+      (
+        (startDate >= taskStartDate && startDate <= taskEndDate) ||
+        (endDate >= taskStartDate && endDate <= taskEndDate) ||
+        (startDate <= taskStartDate && endDate >= taskEndDate)
+      )
+    );
+  });
 
-    // Modifica un'attività
+  if (isSlotOccupied) {
+    alert("Slot temporale occupato per il centro selezionato");
+    return; // Esce dalla funzione senza aggiungere l'attività
+  }
+
+  var task = {
+    center: centerSelect.value,
+    startDate: startDateInput.value,
+    endDate: endDateInput.value,
+    activity: activitySelect.value
+  };
+
+  var id = parseInt(idInput.value, 10);
+  if (!isNaN(id) && id >= 0 && id < data.length) {
+    // Modifica l'attività esistente
+    data[id] = task;
+  } else {
+    // Aggiungi una nuova attività
+    data.push(task);
+  }
+
+  // Aggiorna il grafico di Gantt
+  updateGanttChart();
+
+  // Resetta i campi di input
+  startDateInput.value = '';
+  endDateInput.value = '';
+  idInput.value = '';
+
+  // Salva i dati nel file JSON
+  // saveDataToJSON();
+}
+
+// Modifica un'attività
 function editTask() {
   var idInput = document.getElementById('idInput');
   var id = parseInt(idInput.value, 10);
@@ -279,6 +282,11 @@ function editTask() {
 
     var newStartDate = new Date(startDateInput.value);
     var newEndDate = new Date(endDateInput.value);
+
+    if (newStartDate > newEndDate) {
+      alert("La data di inizio deve essere precedente alla data di fine");
+      return; // Esce dalla funzione senza modificare l'attività
+    }
 
     // Verifica se le nuove date si sovrappongono ad altre attività per il centro selezionato
     var isSlotOccupied = data.some(function(task, index) {
@@ -322,7 +330,6 @@ function editTask() {
     alert("Id non valido!");
   }
 }
-
 
     // Elimina un'attività
     function deleteTask() {
