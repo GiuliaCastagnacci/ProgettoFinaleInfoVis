@@ -88,9 +88,32 @@ body {
   z-index: 9999;
 }
 
-.slot-id {
-  fill: white; 
-  font-size: 12px; 
+/* Stile per la finestra modale */
+.modal {
+  display: none; /* Nasconde la finestra modale per impostazione predefinita */
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.5); /* Sfondo semitrasparente */
 }
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+}
+
+#closeButton {
+  margin-top: 10px;
+}
+
+
+
 
 

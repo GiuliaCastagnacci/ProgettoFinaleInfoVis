@@ -9,6 +9,7 @@ var data = [];
       console.log("Errore nel caricamento dei dati da JSON:", error);
     });
   }
+  
 
   // function saveDataToJSON() {
     // var jsonData = JSON.stringify(data, null, 2);
@@ -114,7 +115,10 @@ var data = [];
         .attr("width", function(d) { return xScale(new Date(d.endDate)) - xScale(new Date(d.startDate)); })
         .attr("height", yScale.bandwidth())
         .attr("fill", function(d) { return getStatusColor(d.activity); })
-        .attr("data-id", function(d, i) { return i; }); // Aggiungi l'attributo data-id con l'indice dell'attività
+        .attr("data-id", function(d, i) { return i; }) // Aggiungi l'attributo data-id con l'indice dell'attività
+        .on("click", function(d) {
+          showTaskInfo(d); // Mostra le informazioni del time slot quando viene cliccato
+        })
 
       bars.exit().remove();
 }
@@ -178,6 +182,42 @@ function isCodiceFiscaleAlreadyUsed(codiceFiscale) {
     return task.codiceFiscale === codiceFiscale;
   });
 }
+
+function showTaskInfo(task) {
+  var modal = document.getElementById("taskModal");
+  var closeButton = document.getElementById("closeButton");
+  var modalContent = document.getElementById("modalContent");
+
+  // Mostra la finestra modale
+  modal.style.display = "block";
+
+  // Aggiorna il contenuto della finestra modale con le informazioni del time slot
+  modalContent.innerHTML = `
+    <h2>Informazioni Time Slot</h2>
+    <p><strong>Centro:</strong> ${task["center"]}</p>
+    <p><strong>Data di inizio:</strong> ${task["startDate"]}</p>
+    <p><strong>Data di fine:</strong> ${task["endDate"]}</p>
+    <p><strong>Attività:</strong> ${task["activity"]}</p>
+    <p><strong>Codice fiscale:</strong> ${task["codiceFiscale"]}</p>
+    <p><strong>Informazioni trapianto:</strong> ${task["informazioniTrapianto"]}</p>
+  `;
+
+  // Chiude la finestra modale quando viene cliccato sul pulsante di chiusura
+  closeButton.addEventListener("click", function() {
+    modal.style.display = "none";
+  });
+
+  // Chiude la finestra modale quando si fa clic al di fuori della finestra
+  window.addEventListener("click", function(event) {
+    if (event.target === modal) {
+      modal.style.display = "none";
+    }
+  });
+}
+
+
+
+
 
 
 // Aggiunge un'attività al grafico
@@ -396,19 +436,17 @@ function editTask() {
   }
 
     // Scarica i dati del grafico in un file JSON
-  function downloadData() {
-    var jsonData = JSON.stringify(data, null, 2);
-
-    var blob = new Blob([jsonData], { type: "application/json" });
-    var url = URL.createObjectURL(blob);
-  
-    var a = document.createElement("a");
-    a.href = url;
-    a.download = "data.json";
-    a.click();
-  
-    URL.revokeObjectURL(url);
-  }
+    function loadDataFromJSON() {
+      d3.json("data.json")
+        .then(function(jsonData) {
+          data = jsonData;
+          updateGanttChart();
+        })
+        .catch(function(error) {
+          console.log("Errore nel caricamento dei dati da JSON:", error);
+        });
+    }
+    
 
   // Funzione per salvare i dati inseriti
   function saveDataToJSON() {

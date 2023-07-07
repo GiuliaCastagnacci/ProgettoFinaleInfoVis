@@ -51,7 +51,13 @@
     <div class="chart-container" id="ganttChart"></div>
   </div>
 
-  <div id="infoWindow" style="display: none;"></div>
+  <!-- Finestra modale per le informazioni del time slot -->
+  <div id="taskModal" class="modal">
+    <div class="modal-content" id="modalContent">
+      <!-- Contenuto dinamico generato dalla funzione showTaskInfo() -->
+    </div>
+    <button id="closeButton">Chiudi</button>
+  </div>
 
   <script src="script.js"></script>
 
