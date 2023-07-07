@@ -184,78 +184,127 @@
     }
 
     // Aggiungi un'attività
-    function addTask(event) {
-      event.preventDefault();
+  function addTask(event) {
+    event.preventDefault();
 
-      var startDateInput = document.getElementById('startDateInput');
-      var endDateInput = document.getElementById('endDateInput');
-      var activitySelect = document.getElementById('activitySelect');
-      var centerSelect = document.getElementById('centerSelect');
-      var idInput = document.getElementById('idInput');
+    var startDateInput = document.getElementById('startDateInput');
+    var endDateInput = document.getElementById('endDateInput');
+    var activitySelect = document.getElementById('activitySelect');
+    var centerSelect = document.getElementById('centerSelect');
+    var idInput = document.getElementById('idInput');
 
-      var task = {
-        center: centerSelect.value,
-        startDate: startDateInput.value,
-        endDate: endDateInput.value,
-        activity: activitySelect.value
-      };
+    var startDate = new Date(startDateInput.value);
+    var endDate = new Date(endDateInput.value);
 
-      var id = parseInt(idInput.value, 10);
-      if (!isNaN(id) && id >= 0 && id < data.length) {
-        // Modifica l'attività esistente
-        data[id] = task;
-      } else {
-        // Aggiungi una nuova attività
-        data.push(task);
-      }
+    // Verifica se lo slot temporale è già occupato per il centro selezionato
+    var isSlotOccupied = data.some(function(task) {
+      var taskStartDate = new Date(task.startDate);
+      var taskEndDate = new Date(task.endDate);
 
-      // Aggiorna il grafico di Gantt
-      updateGanttChart();
+      return (
+        task.center === centerSelect.value &&
+        (
+          (startDate >= taskStartDate && startDate <= taskEndDate) ||
+          (endDate >= taskStartDate && endDate <= taskEndDate) ||
+          (startDate <= taskStartDate && endDate >= taskEndDate)
+        )
+      );
+    });
 
-      // Resetta i campi di input
-      startDateInput.value = '';
-      endDateInput.value = '';
-      idInput.value = '';
-
-      // Salva i dati nel file JSON
-      saveDataToJSON();
+    if (isSlotOccupied) {
+      alert("Slot temporale occupato per il centro selezionato");
+      return; // Esce dalla funzione senza aggiungere l'attività
     }
+
+    var task = {
+      center: centerSelect.value,
+      startDate: startDateInput.value,
+      endDate: endDateInput.value,
+      activity: activitySelect.value
+    };
+
+    var id = parseInt(idInput.value, 10);
+    if (!isNaN(id) && id >= 0 && id < data.length) {
+      // Modifica l'attività esistente
+      data[id] = task;
+    } else {
+      // Aggiungi una nuova attività
+      data.push(task);
+    }
+
+    // Aggiorna il grafico di Gantt
+    updateGanttChart();
+
+    // Resetta i campi di input
+    startDateInput.value = '';
+    endDateInput.value = '';
+    idInput.value = '';
+
+    // Salva i dati nel file JSON
+    saveDataToJSON();
+  }
+
+
 
     // Modifica un'attività
-    function editTask() {
-      var idInput = document.getElementById('idInput');
-      var id = parseInt(idInput.value, 10);
+function editTask() {
+  var idInput = document.getElementById('idInput');
+  var id = parseInt(idInput.value, 10);
 
-      if (!isNaN(id) && id >= 0 && id < data.length) {
-        var selectedTask = data[id];
+  if (!isNaN(id) && id >= 0 && id < data.length) {
+    var selectedTask = data[id];
 
-        var startDateInput = document.getElementById('startDateInput');
-        var endDateInput = document.getElementById('endDateInput');
-        var activitySelect = document.getElementById('activitySelect');
-        var centerSelect = document.getElementById('centerSelect');
+    var startDateInput = document.getElementById('startDateInput');
+    var endDateInput = document.getElementById('endDateInput');
+    var activitySelect = document.getElementById('activitySelect');
+    var centerSelect = document.getElementById('centerSelect');
 
-        selectedTask.startDate = startDateInput.value;
-        selectedTask.endDate = endDateInput.value;
-        selectedTask.activity = activitySelect.value;
-        selectedTask.center = centerSelect.value;
+    var newStartDate = new Date(startDateInput.value);
+    var newEndDate = new Date(endDateInput.value);
 
-        // Aggiorna l'attività aggiornata nell'array dei dati
-        data[id] = selectedTask;
+    // Verifica se le nuove date si sovrappongono ad altre attività per il centro selezionato
+    var isSlotOccupied = data.some(function(task, index) {
+      if (index !== id && task.center === centerSelect.value) {
+        var taskStartDate = new Date(task.startDate);
+        var taskEndDate = new Date(task.endDate);
 
-        // Aggiorna il grafico di Gantt
-        updateGanttChart();
-
-        // Resetta i campi di input
-        startDateInput.value = '';
-        endDateInput.value = '';
-        idInput.value = '';
-
-        // Salva i dati nel file JSON
-        saveDataToJSON();
-      } else {
-        alert("Id non valido!");
+        return (
+          (newStartDate >= taskStartDate && newStartDate <= taskEndDate) ||
+          (newEndDate >= taskStartDate && newEndDate <= taskEndDate) ||
+          (newStartDate <= taskStartDate && newEndDate >= taskEndDate)
+        );
       }
+      return false;
+    });
+
+    if (isSlotOccupied) {
+      alert("Le nuove date si sovrappongono ad altre attività per il centro selezionato");
+      return; // Esce dalla funzione senza modificare l'attività
     }
+
+    selectedTask.startDate = startDateInput.value;
+    selectedTask.endDate = endDateInput.value;
+    selectedTask.activity = activitySelect.value;
+    selectedTask.center = centerSelect.value;
+
+    // Aggiorna l'attività aggiornata nell'array dei dati
+    data[id] = selectedTask;
+
+    // Aggiorna il grafico di Gantt
+    updateGanttChart();
+
+    // Resetta i campi di input
+    startDateInput.value = '';
+    endDateInput.value = '';
+    idInput.value = '';
+
+    // Salva i dati nel file JSON
+    saveDataToJSON();
+  } else {
+    alert("Id non valido!");
+  }
+}
+
 
     // Elimina un'attività
     function deleteTask() {
