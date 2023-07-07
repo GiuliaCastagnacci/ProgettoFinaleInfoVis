@@ -126,62 +126,76 @@
 
     // Aggiorna il grafico di Gantt
     function updateGanttChart() {
-      // Estrai la lista dei centri trapianti organi
-      var centers = data.map(function(d) { return d.center; });
-      centers = Array.from(new Set(centers)); // Rimuovi i duplicati
+  // Estrai la lista dei centri trapianti organi
+  var centers = data.map(function(d) { return d.center; });
+  centers = Array.from(new Set(centers)); // Rimuovi i duplicati
 
-      // Crea la scala x
-      xScale.domain([
-        d3.min(data, function(d) { return new Date(d.startDate); }),
-        d3.max(data, function(d) { return new Date(d.endDate); })
-      ]);
+  // Crea la scala x
+  xScale.domain([
+    d3.min(data, function(d) { return new Date(d.startDate); }),
+    d3.max(data, function(d) { return new Date(d.endDate); })
+  ]);
 
-      // Crea la scala y
-      yScale.domain(centers);
+  // Crea la scala y
+  yScale.domain(centers);
 
-      // Aggiorna l'asse x
-      svg.select(".x-axis")
-        .transition()
-        .duration(500)
-        .call(xAxis);
+  // Aggiorna l'asse x
+  svg.select(".x-axis")
+    .transition()
+    .duration(500)
+    .call(xAxis);
 
-      // Aggiorna l'asse y
-      svg.select(".y-axis")
-        .transition()
-        .duration(500)
-        .call(yAxis);
+  // Aggiorna l'asse y
+  svg.select(".y-axis")
+    .transition()
+    .duration(500)
+    .call(yAxis);
 
-      // Aggiorna le barre delle attività
-      var bars = g.selectAll(".bar")
-        .data(data, function(d, i) { return i; });
+  // Aggiorna le barre delle attività
+  var bars = g.selectAll(".bar")
+    .data(data, function(d, i) { return i; });
 
-      bars.enter()
-        .append("rect")
-        .attr("class", "bar")
-        .merge(bars)
-        .attr("x", function(d) { return xScale(new Date(d.startDate)); })
-        .attr("y", function(d) { return yScale(d.center); })
-        .attr("width", function(d) { return xScale(new Date(d.endDate)) - xScale(new Date(d.startDate)); })
-        .attr("height", yScale.bandwidth())
-        .attr("fill", function(d) { return getStatusColor(d.activity); })
-        .attr("data-id", function(d, i) { return i; }); // Aggiungi l'attributo data-id con l'indice dell'attività
+  bars.enter()
+    .append("rect")
+    .attr("class", "bar")
+    .merge(bars)
+    .attr("x", function(d) { return xScale(new Date(d.startDate)); })
+    .attr("y", function(d) { return yScale(d.center); })
+    .attr("width", function(d) { return xScale(new Date(d.endDate)) - xScale(new Date(d.startDate)); })
+    .attr("height", yScale.bandwidth())
+    .attr("fill", function(d) { return getStatusColor(d.activity); })
+    .attr("data-id", function(d, i) { return i; }); // Aggiungi l'attributo data-id con l'indice dell'attività
 
-      bars.exit().remove();
+  bars.exit().remove();
+}
 
-      // Aggiorna le etichette delle attività
-      var labels = g.selectAll(".label")
-        .data(data, function(d, i) { return i; });
+  // Crea la legenda
+var legend = svg.append("g")
+  .attr("class", "legend")
+  .attr("transform", "translate(" + (innerWidth + margin.right) + "," + margin.top + ")");
 
-      labels.enter()
-        .append("text")
-        .attr("class", "label")
-        .merge(labels)
-        .attr("x", function(d) { return xScale(new Date(d.startDate)) + 5; })
-        .attr("y", function(d) { return yScale(d.center) + yScale.bandwidth() / 2 + 5; })
-        .text(function(d, i) { return i + ": " + ": " + d.activity; }); // Mostra l'indice dell'attività
+var legendData = [
+  { label: "In esecuzione", color: "green" },
+  { label: "In elaborazione", color: "orange" },
+  { label: "Richiesta", color: "blue" }
+];
 
-      labels.exit().remove();
-    }
+var legendItem = legend.selectAll(".legend-item")
+  .data(legendData)
+  .enter()
+  .append("g")
+  .attr("class", "legend-item")
+  .attr("transform", function(d, i) { return "translate(0," + (i * 20) + ")"; });
+
+legendItem.append("rect")
+  .attr("width", 10)
+  .attr("height", 10)
+  .attr("fill", function(d) { return d.color; });
+
+legendItem.append("text")
+  .attr("x", 20)
+  .attr("y", 8)
+  .text(function(d) { return d.label; });
 
     // Aggiungi un'attività
   function addTask(event) {
