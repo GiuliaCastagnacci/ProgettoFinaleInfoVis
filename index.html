@@ -201,7 +201,7 @@ legendItem.append("text")
   .attr("y", 8)
   .text(function(d) { return d.label; });
 
-  // Aggiungi un'attività
+// Aggiungi un'attività
 function addTask(event) {
   event.preventDefault();
 
@@ -214,8 +214,13 @@ function addTask(event) {
   var startDate = new Date(startDateInput.value);
   var endDate = new Date(endDateInput.value);
 
+  if (startDate.getFullYear().toString().length > 4 || endDate.getFullYear().toString().length > 4) {
+    alert("anno inserito non valido, inserisci solo 4 cifre");
+    return; // Esce dalla funzione senza aggiungere l'attività
+  }
+
   if (startDate > endDate) {
-    alert("La data di inizio deve essere precedente alla data di fine.");
+    alert("La data di inizio deve essere precedente alla data di fine");
     return; // Esce dalla funzione senza aggiungere l'attività
   }
 
@@ -267,6 +272,7 @@ function addTask(event) {
   // saveDataToJSON();
 }
 
+
 // Modifica un'attività
 function editTask() {
   var idInput = document.getElementById('idInput');
@@ -282,6 +288,11 @@ function editTask() {
 
     var newStartDate = new Date(startDateInput.value);
     var newEndDate = new Date(endDateInput.value);
+
+    if (newStartDate.getFullYear().toString().length > 4 || newEndDate.getFullYear().toString().length > 4) {
+      alert("anno inserito non valido, inserisci solo 4 cifre!");
+      return; // Esce dalla funzione senza modificare l'attività
+    }
 
     if (newStartDate > newEndDate) {
       alert("La data di inizio deve essere precedente alla data di fine");
@@ -330,6 +341,7 @@ function editTask() {
     alert("Id non valido!");
   }
 }
+
 
     // Elimina un'attività
     function deleteTask() {
