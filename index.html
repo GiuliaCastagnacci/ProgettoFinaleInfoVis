@@ -47,6 +47,10 @@
       </form>
       <button onclick="editTask()">Modifica</button>
       <button onclick="deleteTask()">Elimina</button>
+      </form>
+     <h3>Scarica dati</h3>
+        <button onclick="downloadData()">Scarica dati</button>
+      </form>
     </div>
     <div class="chart-container" id="ganttChart"></div>
   </div>
@@ -64,19 +68,19 @@
       });
     }
 
-    function saveDataToJSON() {
-      var jsonData = JSON.stringify(data, null, 2);
+   // function saveDataToJSON() {
+     // var jsonData = JSON.stringify(data, null, 2);
 
-      var blob = new Blob([jsonData], { type: "application/json" });
-      var url = URL.createObjectURL(blob);
+      //var blob = new Blob([jsonData], { type: "application/json" });
+      //var url = URL.createObjectURL(blob);
 
-      var a = document.createElement("a");
-      a.href = url;
-      a.download = "data.json";
-      a.click();
+      //var a = document.createElement("a");
+      //a.href = url;
+      //a.download = "data.json";
+      //a.click();
 
-      URL.revokeObjectURL(url);
-    }
+      //URL.revokeObjectURL(url);
+   // }
 
     // Dimensioni del grafico
     var width = 800;
@@ -255,7 +259,7 @@ legendItem.append("text")
     idInput.value = '';
 
     // Salva i dati nel file JSON
-    saveDataToJSON();
+    //saveDataToJSON();
   }
 
 
@@ -340,6 +344,27 @@ function editTask() {
         alert("Id non valido!");
       }
     }
+
+    // Scarica i dati del grafico in un file JSON
+function downloadData() {
+  var jsonData = JSON.stringify(data, null, 2);
+
+  var blob = new Blob([jsonData], { type: "application/json" });
+  var url = URL.createObjectURL(blob);
+
+  var a = document.createElement("a");
+  a.href = url;
+  a.download = "dati.json";
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+
+
+function saveDataToJSON() {
+  downloadData();
+}
+
 
     // Funzione per ottenere il colore dello stato dell'attività
     function getStatusColor(status) {
