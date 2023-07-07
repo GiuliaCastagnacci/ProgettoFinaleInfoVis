@@ -1,0 +1,56 @@
+[
+    { 
+    "center": "Centro 1", 
+    "startDate": "2023-06-01",
+    "endDate": "2023-06-03",
+    "activity": "In esecuzione",
+    "id": "1",
+    "codiceFiscale": "RSSMRA80A01H501C",
+    "informazioniTrapianto": "Nome del medico: Dr. Mario Rossi, Sala operatoria: Sala 3B, Tipo di trapianto: Trapianto di rene, Gruppo sanguigno del donatore: A+, Gruppo sanguigno del ricevente: AB-"
+    },
+    { 
+    "center": "Centro 1", 
+    "startDate": "2023-06-10",
+    "endDate": "2023-06-15",
+    "activity": "In elaborazione",
+    "id": "2",
+    "codiceFiscale": "BNCLRA95B15H345D",
+    "informazioniTrapianto": "Tipo di trapianto: Trapianto di fegato, Gruppo sanguigno del donatore: O+, Gruppo sanguigno del ricevente: B-"
+    },
+    { 
+    "center": "Centro 2", 
+    "startDate": "2023-06-05",
+    "endDate": "2023-06-08",
+    "activity": "In esecuzione",
+    "id": "3",
+    "codiceFiscale": "MRNGLS82M28H789E",
+    "informazioniTrapianto": "Nome del medico: Dr. Luca Verdi, Sala operatoria: Sala 1C, Tipo di trapianto: Trapianto di cuore, Gruppo sanguigno del donatore: AB+, Gruppo sanguigno del ricevente: A-"
+    },
+    {  
+    "center": "Centro 2", 
+    "startDate": "2023-06-18",
+    "endDate": "2023-06-25",
+    "activity": "Richiesta",
+    "id": "4",
+    "codiceFiscale": "FRRGNN75H52F123P",
+    "informazioniTrapianto": "Tipo di trapianto: Trapianto di polmone, Gruppo sanguigno del ricevente: B-"
+    },
+    { 
+    "center": "Centro 3", 
+    "startDate": "2023-06-21",
+    "endDate": "2023-06-28",
+    "activity": "In esecuzione",
+    "id": "5",
+    "codiceFiscale": "VLLMRC88D11A567T",
+    "informazioniTrapianto": "Nome del medico: Dr. Marco Gialli, Sala operatoria: Sala 2C, Tipo di trapianto: Trapianto di midollo osseo, Gruppo sanguigno del donatore: A-, Gruppo sanguigno del ricevente: A-"
+    },
+    { 
+    "center": "Centro 3",
+    "startDate": "2023-06-01",
+    "endDate": "2023-06-12",
+    "activity": "Richiesta",
+    "id": "6",
+    "codiceFiscale": "GRLMNN93L25E901W",
+    "informazioniTrapianto": "Tipo di trapianto: Trapianto di cornea, Gruppo sanguigno del ricevente: O-"
+    }
+ ]

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Donazione degli organi</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="header">
+    <img class="logo" src="logo.png" alt="Logo">
+    <h1 class="title">Piattaforma Donazione Organi</h1>
+  </div>
+  
+  <div class="container">
+    <div class="form-container">
+      <h3>Inserisci un'attivit&#224;</h3>
+      <form onsubmit="addTask(event)">
+        <label>Data di inizio:</label>
+        <input type="date" id="startDateInput" required><br>
+        <label>Data di fine:</label>
+        <input type="date" id="endDateInput" required><br>
+        <label>Tipo di attivit&#224;:</label>
+        <select id="activitySelect" required>
+          <option value="In esecuzione">In esecuzione</option>
+          <option value="In elaborazione">In elaborazione</option>
+          <option value="Richiesta">Richiesta</option>
+        </select><br>
+        <label>Centro:</label>
+        <select id="centerSelect" required>
+          <option value="Centro 1">Centro 1</option>
+          <option value="Centro 2">Centro 2</option>
+          <option value="Centro 3">Centro 3</option>
+        </select><br>
+        <label>Id:</label>
+        <input type="text" id="idInput" required><br>
+        <label>Codice Fiscale Paziente:</label>
+        <input type="text" id="codiceFiscaleInput" required><br>
+        <label>Informazioni sul trapianto:</label>
+        <textarea id="informazioniTrapiantoInput" rows="4" cols="50" required></textarea><br>
+        <button class="button" type="submit">Aggiungi</button>
+      </form>
+      <button class="button" onclick="editTask()">Modifica</button>
+      <button class="button" onclick="deleteTask()">Elimina</button>
+      </form>
+     <h3>Scarica dati</h3>
+        <button class="button" onclick="downloadData()">Scarica dati</button>
+      </form>
+    </div>
+    <div class="chart-container" id="ganttChart"></div>
+  </div>
+
+  <div id="infoWindow" style="display: none;"></div>
+
+  <script src="script.js"></script>
+
+</body>
+</html>
