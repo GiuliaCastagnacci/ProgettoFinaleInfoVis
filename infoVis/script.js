@@ -398,26 +398,30 @@ function editTask() {
 }
 
 
-  // Elimina un'attività
-  function deleteTask() {
-    var idInput = document.getElementById('idInput');
-    var id = parseInt(idInput.value, 10);
+function deleteTask() {
+  var idInput = document.getElementById('idInput');
+  var id = idInput.value.trim();
 
-    if (!isNaN(id) && id >= 0 && id < data.length) {
-      data.splice(id, 1); // Rimuovi l'attività dall'array dei dati
+  var index = data.findIndex(function(task) {
+    return task.id === id;
+  });
 
-      // Aggiorna il grafico di Gantt
-      updateGanttChart();
+  if (index !== -1) {
+    data.splice(index, 1); // Rimuovi l'attività dall'array dei dati
 
-      // Resetta i campi di input
-      idInput.value = '';
+    // Aggiorna il grafico di Gantt
+    updateGanttChart();
 
-      // Salva i dati nel file JSON
-      saveDataToJSON();
-    } else {
-      alert("Id non valido!");
-    }
+    // Resetta i campi di input
+    idInput.value = '';
+
+    // Salva i dati nel file JSON
+    saveDataToJSON();
+  } else {
+    alert("ID non valido!");
   }
+}
+
 
     // Scarica i dati del grafico in un file JSON
     function loadDataFromJSON() {
