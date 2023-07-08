@@ -318,39 +318,38 @@ function addTask(event) {
 }
 
 
-// Modifica un'attività
 function editTask() {
   var idInput = document.getElementById('idInput');
-  var id = parseInt(idInput.value, 10);
+  var id = idInput.value.trim();
 
-  if (!isNaN(id) && id >= 0 && id < data.length) {
-    var selectedTask = data[id];
+  var selectedTask = data.find(function(task) {
+    return task.id === id;
+  });
 
+  if (selectedTask) {
     var startDateInput = document.getElementById('startDateInput');
     var endDateInput = document.getElementById('endDateInput');
     var activitySelect = document.getElementById('activitySelect');
     var centerSelect = document.getElementById('centerSelect');
+    var codiceFiscaleInput = document.getElementById('codiceFiscaleInput');
+    var informazioniTrapiantoInput = document.getElementById('informazioniTrapiantoInput');
 
     var newStartDate = new Date(startDateInput.value);
     var newEndDate = new Date(endDateInput.value);
 
-    var codiceFiscaleInput = document.getElementById('codiceFiscaleInput');
-    var informazioniTrapiantoInput = document.getElementById('informazioniTrapiantoInput');
-
-
     if (newStartDate.getFullYear().toString().length > 4 || newEndDate.getFullYear().toString().length > 4) {
-      alert("anno inserito non valido, inserisci solo 4 cifre!");
-      return; // Esce dalla funzione senza modificare l'attività
+      alert("Anno inserito non valido, inserisci solo 4 cifre!");
+      return;
     }
 
     if (newStartDate > newEndDate) {
       alert("La data di inizio deve essere precedente alla data di fine");
-      return; // Esce dalla funzione senza modificare l'attività
+      return;
     }
 
     // Verifica se le nuove date si sovrappongono ad altre attività per il centro selezionato
-    var isSlotOccupied = data.some(function(task, index) {
-      if (index !== id && task.center === centerSelect.value) {
+    var isSlotOccupied = data.some(function(task) {
+      if (task.id !== id && task.center === centerSelect.value) {
         var taskStartDate = new Date(task.startDate);
         var taskEndDate = new Date(task.endDate);
 
@@ -365,37 +364,21 @@ function editTask() {
 
     if (isSlotOccupied) {
       alert("Le nuove date si sovrappongono ad altre attività per il centro selezionato");
-      return; // Esce dalla funzione senza modificare l'attività
+      return;
     }
 
     var codiceFiscale = codiceFiscaleInput.value.trim();
     if (!isCodiceFiscaleValid(codiceFiscale)) {
-      alert("Il codice fiscale inserito non e' valido.");
-      return; // Esce dalla funzione senza modificare l'attività
+      alert("Il codice fiscale inserito non è valido.");
+      return;
     }
-    if (newCodiceFiscale !== selectedTask.codiceFiscale && isCodiceFiscaleAlreadyUsed(newCodiceFiscale)) {
-      alert("Il nuovo codice fiscale scelto e' gia' presente in un altro time slot. Inserire un codice fiscale unico.");
-      return; // Esce dalla funzione senza modificare l'attività
-    }
-
-    var newId = idInput.value.trim();
-    if (newId !== selectedTask.id && isIdAlreadyUsed(newId)) {
-      alert("Il nuovo ID scelto e' gia' utilizzato in un altro time slot. Scegliere un ID unico.");
-      return; // Esce dalla funzione senza modificare l'attività
-    }
-
 
     selectedTask.startDate = startDateInput.value;
     selectedTask.endDate = endDateInput.value;
     selectedTask.activity = activitySelect.value;
     selectedTask.center = centerSelect.value;
-    selectedTask.id = idInput.value.trim();
     selectedTask.codiceFiscale = codiceFiscale;
     selectedTask.informazioniTrapianto = informazioniTrapiantoInput.value.trim();
-
-
-    // Aggiorna l'attività aggiornata nell'array dei dati
-    data[id] = selectedTask;
 
     // Aggiorna il grafico di Gantt
     updateGanttChart();
@@ -410,9 +393,10 @@ function editTask() {
     // Salva i dati nel file JSON
     saveDataToJSON();
   } else {
-    alert("Id non valido!");
+    alert("ID non valido!");
   }
 }
+
 
   // Elimina un'attività
   function deleteTask() {
@@ -447,6 +431,21 @@ function editTask() {
         });
     }
     
+      // Scarica i dati del grafico in un file JSON
+function downloadData() {
+  var jsonData = JSON.stringify(data, null, 2);
+
+  var blob = new Blob([jsonData], { type: "application/json" });
+  var url = URL.createObjectURL(blob);
+
+  var a = document.createElement("a");
+  a.href = url;
+  a.download = "dati.json";
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+
 
   // Funzione per salvare i dati inseriti
   function saveDataToJSON() {
