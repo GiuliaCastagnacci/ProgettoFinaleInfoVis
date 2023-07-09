@@ -69,7 +69,7 @@ body {
 .form-container textarea {
   resize: vertical;
 }
-
+ 
 .form-container button[type="submit"] {
   align-self: flex-end;
 }

@@ -71,7 +71,7 @@ var data = [];
     g.append("g")
       .attr("class", "y-axis")
       .call(yAxis);
-
+ 
       
     // Aggiorna il grafico di Gantt
     function updateGanttChart() {
