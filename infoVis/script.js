@@ -1,15 +1,16 @@
 var data = [];
 
-  // Carica i dati da un file JSON
-  function loadDataFromJSON() {
-    d3.json("data.json").then(function(jsonData) {
-      data = jsonData;
-      updateGanttChart();
-      showTaskInfo(0);
-    }).catch(function(error) {
-      console.log("Errore nel caricamento dei dati da JSON:", error);
-    });
-  }
+
+function loadDataFromJSON() {
+  d3.json("data.json").then(function(jsonData) {
+    data = jsonData;
+    updateGanttChart(data); // Passa l'intero array dei dati
+    showTaskInfo(0);
+  }).catch(function(error) {
+    console.log("Errore nel caricamento dei dati da JSON:", error);
+  });
+}
+
   
 
   // function saveDataToJSON() {
@@ -74,11 +75,38 @@ var data = [];
  
       
     // Aggiorna il grafico di Gantt
-    function updateGanttChart() {
+    function updateGanttChart(filteredData) {
+
+      // Se non è stato fornito l'array dei dati filtrati, utilizza l'intero array dei dati
+      var filtered = filteredData || data;
   
       // Estrai la lista dei centri trapianti organi
       var centers = data.map(function(d) { return d.center; });
       centers = Array.from(new Set(centers)); // Rimuovi i duplicati
+
+      // Estrai la lista degli anni
+      var years = data.map(function(d) {
+        return new Date(d.startDate).getFullYear();
+      });
+      years = Array.from(new Set(years)); // Rimuovi i duplicati
+
+      // Aggiorna il menu a tendina degli anni
+      var yearSelect = document.getElementById("yearSelect");
+      yearSelect.innerHTML = ""; // Resetta le opzioni
+
+      // Aggiungi le opzioni degli anni
+      var allYearsOption = document.createElement("option");
+      allYearsOption.value = "";
+      allYearsOption.text = "Tutti gli anni";
+      yearSelect.add(allYearsOption);
+
+      years.forEach(function(year) {
+        var option = document.createElement("option");
+        option.value = year;
+        option.text = year;
+        yearSelect.add(option);
+      });
+
 
       // Crea la scala x
       xScale.domain([
@@ -104,9 +132,10 @@ var data = [];
         .duration(500)
         .call(yAxis);
 
-      // Aggiorna le barre delle attività
-      var bars = g.selectAll(".bar")
-        .data(data, function(_, i) { return i; });
+            // Aggiorna le barre delle attività
+        var bars = g.selectAll(".bar")
+        .data(filteredData || data, function(_, i) { return i; });
+
 
         bars.enter()
         .append("rect")
@@ -123,9 +152,6 @@ var data = [];
           var id = d3.select(this).attr("data-id");
           showTaskInfo(id);
         })
-        
-        
-      
 
       bars.exit().remove();
 }
@@ -166,6 +192,28 @@ legendItem.append("text")
   var year = date.getFullYear();
   return day.toString().padStart(2, '0') + '\n' + month + '\n' + year;
 }
+
+function filterByYear() {
+  var yearSelect = document.getElementById("yearSelect");
+  var selectedYear = yearSelect.value;
+
+  if (selectedYear) {
+    var filteredData = data.filter(function(d) {
+      return new Date(d.startDate).getFullYear().toString() === selectedYear;
+    });
+
+    // Aggiorna il grafico di Gantt con i dati filtrati
+    updateGanttChart(filteredData);
+  } else {
+    // Se viene selezionata l'opzione "Tutti gli anni", mostra tutti i dati
+    updateGanttChart(data);
+  }
+}
+
+
+
+
+
 
 // Funzione per controllare il formato del codice fiscale
 function validateCodiceFiscale(codiceFiscale) {

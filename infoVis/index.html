@@ -43,11 +43,16 @@
           <button class="button" type="submit">Aggiungi</button>
           <button class="button" onclick="editTask()">Modifica</button>
           <button class="button" onclick="deleteTask()">Elimina</button>
+          
         </div>
+        
       </form>
     </div>
     <div class="chart-container-wrapper">
       <div class="chart-container" id="ganttChart"></div>
+      <select id="yearSelect" onchange="filterByYear()">
+        <option value="">Tutti gli anni</option>
+      </select>
       <button class="button download-button" onclick="downloadData()">Scarica dati</button>
     </div>
     
