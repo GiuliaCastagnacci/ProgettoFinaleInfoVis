@@ -5,6 +5,7 @@ var data = [];
     d3.json("data.json").then(function(jsonData) {
       data = jsonData;
       updateGanttChart();
+      showTaskInfo(0);
     }).catch(function(error) {
       console.log("Errore nel caricamento dei dati da JSON:", error);
     });
@@ -71,6 +72,7 @@ var data = [];
       .attr("class", "y-axis")
       .call(yAxis);
 
+      
     // Aggiorna il grafico di Gantt
     function updateGanttChart() {
   
@@ -104,21 +106,26 @@ var data = [];
 
       // Aggiorna le barre delle attività
       var bars = g.selectAll(".bar")
-        .data(data, function(d, i) { return i; });
+        .data(data, function(_, i) { return i; });
 
-      bars.enter()
+        bars.enter()
         .append("rect")
         .attr("class", "bar")
+        .attr("data-id", function(d) { return d.id; })
         .merge(bars)
         .attr("x", function(d) { return xScale(new Date(d.startDate)); })
         .attr("y", function(d) { return yScale(d.center); })
         .attr("width", function(d) { return xScale(new Date(d.endDate)) - xScale(new Date(d.startDate)); })
         .attr("height", yScale.bandwidth())
         .attr("fill", function(d) { return getStatusColor(d.activity); })
-        .attr("data-id", function(d, i) { return i; }) // Aggiungi l'attributo data-id con l'indice dell'attività
-        .on("click", function(d) {
-          showTaskInfo(d); // Mostra le informazioni del time slot quando viene cliccato
+        
+        .on("click", function() {
+          var id = d3.select(this).attr("data-id");
+          showTaskInfo(id);
         })
+        
+        
+      
 
       bars.exit().remove();
 }
@@ -183,37 +190,60 @@ function isCodiceFiscaleAlreadyUsed(codiceFiscale) {
   });
 }
 
-function showTaskInfo(task) {
-  var modal = document.getElementById("taskModal");
-  var closeButton = document.getElementById("closeButton");
-  var modalContent = document.getElementById("modalContent");
 
-  // Mostra la finestra modale
-  modal.style.display = "block";
-
-  // Aggiorna il contenuto della finestra modale con le informazioni del time slot
-  modalContent.innerHTML = `
-    <h2>Informazioni Time Slot</h2>
-    <p><strong>Centro:</strong> ${task["center"]}</p>
-    <p><strong>Data di inizio:</strong> ${task["startDate"]}</p>
-    <p><strong>Data di fine:</strong> ${task["endDate"]}</p>
-    <p><strong>Attività:</strong> ${task["activity"]}</p>
-    <p><strong>Codice fiscale:</strong> ${task["codiceFiscale"]}</p>
-    <p><strong>Informazioni trapianto:</strong> ${task["informazioniTrapianto"]}</p>
-  `;
-
-  // Chiude la finestra modale quando viene cliccato sul pulsante di chiusura
-  closeButton.addEventListener("click", function() {
-    modal.style.display = "none";
+// Funzione per aprire la finestra modale e visualizzare le informazioni dell'attività
+function showTaskInfo(id) {
+  var task = data.find(function(d) {
+    return d.id === id;
   });
 
-  // Chiude la finestra modale quando si fa clic al di fuori della finestra
-  window.addEventListener("click", function(event) {
-    if (event.target === modal) {
-      modal.style.display = "none";
-    }
-  });
+  if (task) {
+    var modal = document.getElementById("taskModal");
+    var modalContent = document.getElementById("modalContent");
+    modalContent.innerHTML = ""; // Resetta il contenuto della finestra modale
+
+    var idElement = document.createElement("p");
+    idElement.innerHTML = "<strong>ID:</strong> " + task.id;
+    modalContent.appendChild(idElement);
+    
+    // Aggiungi le informazioni dell'attività alla finestra modale
+    var center = document.createElement("p");
+    center.innerHTML = "<strong>Centro:</strong> " + task.center;
+    modalContent.appendChild(center);
+
+    var startDate = document.createElement("p");
+    startDate.innerHTML = "<strong>Data inizio:</strong> " + task.startDate;
+    modalContent.appendChild(startDate);
+
+    var endDate = document.createElement("p");
+    endDate.innerHTML = "<strong>Data fine:</strong> " + task.endDate;
+    modalContent.appendChild(endDate);
+
+    var activity = document.createElement("p");
+    activity.innerHTML = "<strong>Attivit&#224:</strong> " + task.activity;
+    modalContent.appendChild(activity);
+
+    var codiceFiscale = document.createElement("p");
+    codiceFiscale.innerHTML = "<strong>Codice fiscale:</strong> " + task.codiceFiscale;
+    modalContent.appendChild(codiceFiscale);
+
+    var informazioniTrapianto = document.createElement("p");
+    informazioniTrapianto.innerHTML = "<strong>Informazioni trapianto:</strong> " + task.informazioniTrapianto;
+    modalContent.appendChild(informazioniTrapianto);
+
+    modal.style.display = "block";
+  }
 }
+
+// Funzione per chiudere la finestra modale
+function closeTaskModal() {
+  var modal = document.getElementById("taskModal");
+  modal.style.display = "none";
+}
+
+// Aggiungi un gestore di eventi per il pulsante di chiusura
+var closeButton = document.getElementById("closeButton");
+closeButton.addEventListener("click", closeTaskModal);
 
 
 
