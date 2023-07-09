@@ -73,88 +73,91 @@ function loadDataFromJSON() {
       .attr("class", "y-axis")
       .call(yAxis);
  
+    var selectedYear = "";
       
     // Aggiorna il grafico di Gantt
-    function updateGanttChart(filteredData) {
+  function updateGanttChart(filteredData) {
+    // Estrai la lista dei centri trapianti organi
+    var centers = data.map(function(d) { return d.center; });
+    centers = Array.from(new Set(centers)); // Rimuovi i duplicati
 
-      // Se non è stato fornito l'array dei dati filtrati, utilizza l'intero array dei dati
-      var filtered = filteredData || data;
-  
-      // Estrai la lista dei centri trapianti organi
-      var centers = data.map(function(d) { return d.center; });
-      centers = Array.from(new Set(centers)); // Rimuovi i duplicati
+    // Estrai la lista degli anni
+    var years = data.map(function(d) {
+      return new Date(d.startDate).getFullYear();
+    });
+    years = Array.from(new Set(years)); // Rimuovi i duplicati
 
-      // Estrai la lista degli anni
-      var years = data.map(function(d) {
-        return new Date(d.startDate).getFullYear();
+    // Aggiorna il menu a tendina degli anni
+    var yearSelect = document.getElementById("yearSelect");
+    yearSelect.innerHTML = ""; // Resetta le opzioni
+
+
+    // Aggiungi le opzioni degli anni
+    var allYearsOption = document.createElement("option");
+    allYearsOption.value = "";
+    allYearsOption.text = "Tutti gli anni";
+    yearSelect.add(allYearsOption);
+
+    years.forEach(function(year) {
+      var option = document.createElement("option");
+      option.value = year;
+      option.text = year;
+      yearSelect.add(option);
+    });
+
+      // Filtra i dati in base all'anno selezionato
+    var filtered = filteredData || data;
+
+    // Calcola la data di inizio e la data di fine del periodo che ha degli slot
+    var startDate = d3.min(filtered, function(d) { return new Date(d.startDate); });
+    var endDate = d3.max(filtered, function(d) { return new Date(d.endDate); });
+
+    // Imposta il dominio della scala x solo con il periodo che ha degli slot
+    xScale.domain([startDate, endDate]);
+
+    // Crea la scala y
+    yScale.domain(centers);
+
+    // Aggiorna l'asse x
+    svg.select(".x-axis")
+      .transition()
+      .duration(500)
+      .call(xAxis)
+      .selectAll(".tick text")
+      .attr("transform", "rotate(-45)")
+      .style("text-anchor", "end")
+      .text(function(d) { return getFormattedDate(d); });
+
+    // Aggiorna l'asse y
+    svg.select(".y-axis")
+      .transition()
+      .duration(500)
+      .call(yAxis);
+
+    // Filtra i dati in base all'anno selezionato
+    var filtered = filteredData || data;
+    var filteredBars = g.selectAll(".bar")
+      .data(filtered, function(_, i) { return i; });
+
+    // Aggiorna le barre delle attività filtrate
+    filteredBars.enter()
+      .append("rect")
+      .attr("class", "bar")
+      .attr("data-id", function(d) { return d.id; })
+      .merge(filteredBars)
+      .attr("x", function(d) { return xScale(new Date(d.startDate)); })
+      .attr("y", function(d) { return yScale(d.center); })
+      .attr("width", function(d) { return xScale(new Date(d.endDate)) - xScale(new Date(d.startDate)); })
+      .attr("height", yScale.bandwidth())
+      .attr("fill", function(d) { return getStatusColor(d.activity); })
+      .on("click", function() {
+        var id = d3.select(this).attr("data-id");
+        showTaskInfo(id);
       });
-      years = Array.from(new Set(years)); // Rimuovi i duplicati
 
-      // Aggiorna il menu a tendina degli anni
-      var yearSelect = document.getElementById("yearSelect");
-      yearSelect.innerHTML = ""; // Resetta le opzioni
-
-      // Aggiungi le opzioni degli anni
-      var allYearsOption = document.createElement("option");
-      allYearsOption.value = "";
-      allYearsOption.text = "Tutti gli anni";
-      yearSelect.add(allYearsOption);
-
-      years.forEach(function(year) {
-        var option = document.createElement("option");
-        option.value = year;
-        option.text = year;
-        yearSelect.add(option);
-      });
-
-
-      // Crea la scala x
-      xScale.domain([
-        d3.min(data, function(d) { return new Date(d.startDate); }),
-        d3.max(data, function(d) { return new Date(d.endDate); })
-      ]);
-
-      // Crea la scala y
-      yScale.domain(centers);
-
-      // Aggiorna l'asse x
-      svg.select(".x-axis")
-        .transition()
-        .duration(500)
-        .call(xAxis)
-        .selectAll(".tick text")
-        .text(function(d) { return getFormattedDate(d); });
-
-
-      // Aggiorna l'asse y
-      svg.select(".y-axis")
-        .transition()
-        .duration(500)
-        .call(yAxis);
-
-            // Aggiorna le barre delle attività
-        var bars = g.selectAll(".bar")
-        .data(filteredData || data, function(_, i) { return i; });
-
-
-        bars.enter()
-        .append("rect")
-        .attr("class", "bar")
-        .attr("data-id", function(d) { return d.id; })
-        .merge(bars)
-        .attr("x", function(d) { return xScale(new Date(d.startDate)); })
-        .attr("y", function(d) { return yScale(d.center); })
-        .attr("width", function(d) { return xScale(new Date(d.endDate)) - xScale(new Date(d.startDate)); })
-        .attr("height", yScale.bandwidth())
-        .attr("fill", function(d) { return getStatusColor(d.activity); })
-        
-        .on("click", function() {
-          var id = d3.select(this).attr("data-id");
-          showTaskInfo(id);
-        })
-
-      bars.exit().remove();
+    filteredBars.exit().remove();
 }
+
 
   // Crea la legenda
 var legend = svg.append("g")
@@ -193,22 +196,25 @@ legendItem.append("text")
   return day.toString().padStart(2, '0') + '\n' + month + '\n' + year;
 }
 
+
 function filterByYear() {
   var yearSelect = document.getElementById("yearSelect");
   var selectedYear = yearSelect.value;
 
-  if (selectedYear) {
+  if (selectedYear === "") {
+    // Se viene selezionata l'opzione "Tutti gli anni", mostra tutti i dati
+    updateGanttChart(data);
+  } else {
     var filteredData = data.filter(function(d) {
       return new Date(d.startDate).getFullYear().toString() === selectedYear;
     });
 
     // Aggiorna il grafico di Gantt con i dati filtrati
     updateGanttChart(filteredData);
-  } else {
-    // Se viene selezionata l'opzione "Tutti gli anni", mostra tutti i dati
-    updateGanttChart(data);
   }
 }
+
+
 
 
 
