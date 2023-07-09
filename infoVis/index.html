@@ -39,25 +39,26 @@
         <input type="text" id="codiceFiscaleInput" required><br>
         <label>Informazioni sul trapianto:</label>
         <textarea id="informazioniTrapiantoInput" rows="4" cols="50" required></textarea><br>
-        <button class="button" type="submit">Aggiungi</button>
-      </form>
-      <button class="button" onclick="editTask()">Modifica</button>
-      <button class="button" onclick="deleteTask()">Elimina</button>
-      </form>
-     <h3>Scarica dati</h3>
-        <button class="button" onclick="downloadData()">Scarica dati</button>
+        <div class="button-container"></div>
+          <button class="button" type="submit">Aggiungi</button>
+          <button class="button" onclick="editTask()">Modifica</button>
+          <button class="button" onclick="deleteTask()">Elimina</button>
+        </div>
       </form>
     </div>
-    <div class="chart-container" id="ganttChart"></div>
+    <div class="chart-container-wrapper">
+      <div class="chart-container" id="ganttChart"></div>
+      <button class="button download-button" onclick="downloadData()">Scarica dati</button>
+    </div>
+    
   </div>
 
   <!-- Finestra modale per le informazioni del time slot -->
-  <div id="taskModal" class="modal">
-    <div class="modal-content" id="modalContent">
-      <!-- Contenuto dinamico generato dalla funzione showTaskInfo() -->
-    </div>
-    <button class="button" id="closeButton">Chiudi</button>
-  </div>
+<div id="taskModal" class="modal">
+  <div class="modal-content" id="modalContent"></div>
+  <button class="button" id="closeButton">Chiudi</button>
+</div>
+
 
   <script src="script.js"></script>
 

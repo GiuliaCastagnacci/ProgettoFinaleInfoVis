@@ -28,7 +28,7 @@ var data = [];
 
     // Dimensioni del grafico
     var width = 1000;
-    var height = 600;
+    var height = 400;
 
     // Margini del grafico
     var margin = { top: 20, right: 30, bottom: 50, left: 180 };
