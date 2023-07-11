@@ -23,15 +23,17 @@
         <input type="date" id="endDateInput" required><br>
         <label>Tipo di attivit&#224;:</label>
         <select id="activitySelect" required>
-          <option value="In esecuzione">In esecuzione</option>
+          <option value="In esecuzione">Eseguita</option>
           <option value="In elaborazione">In elaborazione</option>
           <option value="Richiesta">Richiesta</option>
         </select><br>
         <label>Centro:</label>
         <select id="centerSelect" required>
-          <option value="Centro 1">Centro 1</option>
-          <option value="Centro 2">Centro 2</option>
-          <option value="Centro 3">Centro 3</option>
+          <option value="Centro 1">Policlinico San Matteo</option>
+          <option value="Centro 2">Ospedale San Raffaele</option>
+          <option value="Centro 3">Ospedale Maggiore</option>
+          <option value="Centro 4">Policlinico Umberto I</option>
+          <option value="Centro 5">Ospedale San Martino</option>
         </select><br>
         <label>Id:</label>
         <input type="text" id="idInput" required><br>
@@ -50,11 +52,12 @@
     </div>
     <div class="chart-container-wrapper">
       <div class="chart-container" id="ganttChart"></div>
-      <select id="yearSelect" onchange="filterByYear()">
-        <option value="">Tutti gli anni</option>
+      <select id="yearSelect" class="all-years-option" onchange="filterByYear()">
+        <option value="" >Tutti gli anni</option>
       </select>
       <button class="button download-button" onclick="downloadData()">Scarica dati</button>
     </div>
+    
     
   </div>
 

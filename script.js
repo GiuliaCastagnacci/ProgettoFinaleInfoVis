@@ -1,6 +1,5 @@
 var data = [];
 
-
 function loadDataFromJSON() {
   d3.json("data.json").then(function(jsonData) {
     data = jsonData;
@@ -9,9 +8,11 @@ function loadDataFromJSON() {
   }).catch(function(error) {
     console.log("Errore nel caricamento dei dati da JSON:", error);
   });
-}
-
+  var currentYear = new Date().getFullYear();
+  yearSelect.value = currentYear.toString();
   
+
+}
 
   // function saveDataToJSON() {
     // var jsonData = JSON.stringify(data, null, 2);
@@ -212,7 +213,11 @@ function filterByYear() {
     // Aggiorna il grafico di Gantt con i dati filtrati
     updateGanttChart(filteredData);
   }
+
+  // Aggiorna il valore dell'opzione selezionata nel campo di selezione
+  yearSelect.value = selectedYear;
 }
+
 
 
 
@@ -475,7 +480,7 @@ function editTask() {
     informazioniTrapiantoInput.value = '';
 
     // Salva i dati nel file JSON
-    saveDataToJSON();
+    //saveDataToJSON();
   } else {
     alert("ID non valido!");
   }
@@ -500,7 +505,7 @@ function deleteTask() {
     idInput.value = '';
 
     // Salva i dati nel file JSON
-    saveDataToJSON();
+    //saveDataToJSON();
   } else {
     alert("ID non valido!");
   }

@@ -1,6 +1,6 @@
 [
     { 
-    "center": "Centro 1", 
+    "center": "Policlinico San Matteo", 
     "startDate": "2023-06-01",
     "endDate": "2023-06-03",
     "activity": "Eseguita",
@@ -9,7 +9,7 @@
     "informazioniTrapianto": "Nome del medico: Dr. Mario Rossi, Sala operatoria: Sala 3B, Tipo di trapianto: Trapianto di rene, Gruppo sanguigno del donatore: A+, Gruppo sanguigno del ricevente: AB-"
     },
     { 
-    "center": "Centro 1", 
+    "center": "Policlinico San Matteo", 
     "startDate": "2023-06-10",
     "endDate": "2023-06-15",
     "activity": "In elaborazione",
@@ -18,7 +18,7 @@
     "informazioniTrapianto": "Tipo di trapianto: Trapianto di fegato, Gruppo sanguigno del donatore: O+, Gruppo sanguigno del ricevente: B-"
     },
     { 
-    "center": "Centro 2", 
+    "center": "Ospedale San Raffaele", 
     "startDate": "2023-06-05",
     "endDate": "2023-06-08",
     "activity": "Eseguita",
@@ -27,7 +27,7 @@
     "informazioniTrapianto": "Nome del medico: Dr. Luca Verdi, Sala operatoria: Sala 1C, Tipo di trapianto: Trapianto di cuore, Gruppo sanguigno del donatore: AB+, Gruppo sanguigno del ricevente: A-"
     },
     {  
-    "center": "Centro 2", 
+    "center": "Ospedale San Raffaele", 
     "startDate": "2023-06-18",
     "endDate": "2023-06-25",
     "activity": "Richiesta",
@@ -36,7 +36,7 @@
     "informazioniTrapianto": "Tipo di trapianto: Trapianto di polmone, Gruppo sanguigno del ricevente: B-"
     },
     { 
-    "center": "Centro 3", 
+    "center": "Ospedale Maggiore", 
     "startDate": "2023-06-21",
     "endDate": "2023-06-28",
     "activity": "Eseguita",
@@ -45,7 +45,7 @@
     "informazioniTrapianto": "Nome del medico: Dr. Marco Gialli, Sala operatoria: Sala 2C, Tipo di trapianto: Trapianto di midollo osseo, Gruppo sanguigno del donatore: A-, Gruppo sanguigno del ricevente: A-"
     },
     { 
-    "center": "Centro 3",
+    "center": "Ospedale Maggiore",
     "startDate": "2024-06-01",
     "endDate": "2024-06-12",
     "activity": "Richiesta",
