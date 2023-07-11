@@ -162,7 +162,7 @@ var legend = svg.append("g")
   .attr("transform", "translate(" + (innerWidth + margin.right) + "," + margin.top + ")");
 
 var legendData = [
-  { label: "In esecuzione", color: "#7FFF00" },
+  { label: "Eseguita", color: "#7FFF00" },
   { label: "In elaborazione", color: "#B886FF" },
   { label: "Richiesta", color: "#7EA6E0" }
 ];
@@ -537,7 +537,7 @@ function downloadData() {
   // Funzione per ottenere il colore dello stato dell'attività
   function getStatusColor(status) {
     // Codice per ottenere il colore in base allo stato dell'attività
-    if (status === "In esecuzione") {
+    if (status === "Eseguita") {
       return "#7FFF00";
     } else if (status === "In elaborazione") {
       return "#B886FF";

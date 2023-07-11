@@ -3,7 +3,7 @@
     "center": "Centro 1", 
     "startDate": "2023-06-01",
     "endDate": "2023-06-03",
-    "activity": "In esecuzione",
+    "activity": "Eseguita",
     "id": "1",
     "codiceFiscale": "RSSMRA80A01H501C",
     "informazioniTrapianto": "Nome del medico: Dr. Mario Rossi, Sala operatoria: Sala 3B, Tipo di trapianto: Trapianto di rene, Gruppo sanguigno del donatore: A+, Gruppo sanguigno del ricevente: AB-"
@@ -21,7 +21,7 @@
     "center": "Centro 2", 
     "startDate": "2023-06-05",
     "endDate": "2023-06-08",
-    "activity": "In esecuzione",
+    "activity": "Eseguita",
     "id": "3",
     "codiceFiscale": "MRNGLS82M28H789E",
     "informazioniTrapianto": "Nome del medico: Dr. Luca Verdi, Sala operatoria: Sala 1C, Tipo di trapianto: Trapianto di cuore, Gruppo sanguigno del donatore: AB+, Gruppo sanguigno del ricevente: A-"
@@ -39,7 +39,7 @@
     "center": "Centro 3", 
     "startDate": "2023-06-21",
     "endDate": "2023-06-28",
-    "activity": "In esecuzione",
+    "activity": "Eseguita",
     "id": "5",
     "codiceFiscale": "VLLMRC88D11A567T",
     "informazioniTrapianto": "Nome del medico: Dr. Marco Gialli, Sala operatoria: Sala 2C, Tipo di trapianto: Trapianto di midollo osseo, Gruppo sanguigno del donatore: A-, Gruppo sanguigno del ricevente: A-"
