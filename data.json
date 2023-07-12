@@ -602,13 +602,31 @@
         "codiceFiscale": "TPCVBN70E05H321B",
         "informazioniTrapianto": "Sala operatoria: Sala 1B, Tipo di trapianto: Trapianto di cornea, Gruppo sanguigno del donatore: A-, Gruppo sanguigno del ricevente: A-"
     },
-      {
+    {
         "center": "Policlinico Umberto I",
         "startDate": "2022-08-05",
         "endDate": "2022-08-08",
         "activity": "Eseguita",
         "id": "178",
         "codiceFiscale": "TPCVBP70E05H321B",
+        "informazioniTrapianto": "Sala operatoria: Sala 1B, Tipo di trapianto: Trapianto di cornea, Gruppo sanguigno del donatore: A-, Gruppo sanguigno del ricevente: A-"
+    },
+     {
+        "center": "Ospedale Maggiore",
+        "startDate": "2022-07-05",
+        "endDate": "2022-07-10",
+        "activity": "Eseguita",
+        "id": "179",
+        "codiceFiscale": "BACVBP70E05H321B",
+        "informazioniTrapianto": "Sala operatoria: Sala 1B, Tipo di trapianto: Trapianto di cornea, Gruppo sanguigno del donatore: A-, Gruppo sanguigno del ricevente: A-"
+    },
+    {
+        "center": "Ospedale San Raffaele",
+        "startDate": "2022-08-15",
+        "endDate": "2022-07-30",
+        "activity": "Eseguita",
+        "id": "180",
+        "codiceFiscale": "BACVBP70E05H321A",
         "informazioniTrapianto": "Sala operatoria: Sala 1B, Tipo di trapianto: Trapianto di cornea, Gruppo sanguigno del donatore: A-, Gruppo sanguigno del ricevente: A-"
     },
     {
