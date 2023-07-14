@@ -15,13 +15,12 @@ function loadDataFromJSON() {
 }
 
 
-
     // Dimensioni del grafico
-    var width = 1000;
+    var width = 900;
     var height = 400;
 
     // Margini del grafico
-    var margin = { top: 20, right: 30, bottom: 50, left: 180 };
+    var margin = { top: 20, right: 30, bottom: 50, left: 120 };
     var innerWidth = width - margin.left - margin.right;
     var innerHeight = height - margin.top - margin.bottom;
 
