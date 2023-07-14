@@ -11,71 +11,71 @@ function loadDataFromJSON() {
   });
   var currentYear = new Date().getFullYear();
   yearSelect.value = currentYear.toString();
-  
-
 }
 
+// Dimensioni del grafico
+var width = 900;
+var height = 400;
 
-    // Dimensioni del grafico
-    var width = 900;
-    var height = 400;
+// Margini del grafico
+var margin = { top: 20, right: 30, bottom: 50, left: 120 };
+var innerWidth = width - margin.left - margin.right;
+var innerHeight = height - margin.top - margin.bottom;
 
-    // Margini del grafico
-    var margin = { top: 20, right: 30, bottom: 50, left: 120 };
-    var innerWidth = width - margin.left - margin.right;
-    var innerHeight = height - margin.top - margin.bottom;
+// Creazione del grafico di Gantt
+var svg = d3.select("#ganttChart")
+  .append("svg")
+  .attr("width", width)
+  .attr("height",height);
 
-    // Creazione del grafico di Gantt
-    var svg = d3.select("#ganttChart")
-      .append("svg")
-      .attr("width", width)
-      .attr("height",height);
+// Crea la scala x
+var xScale = d3.scaleTime()
+  .range([0, innerWidth]);
 
-    // Crea la scala x
-    var xScale = d3.scaleTime()
-      .range([0, innerWidth]);
+// Crea la scala y
+var yScale = d3.scaleBand()
+  .range([0, innerHeight])
+  .padding(0.1);
 
-    // Crea la scala y
-    var yScale = d3.scaleBand()
-      .range([0, innerHeight])
-      .padding(0.1);
+// Crea gli assi x e y
+var xAxis = d3.axisBottom(xScale)
+  .tickFormat(d3.timeFormat("%d"))
+  .tickSize(0)
+  .tickPadding(8);
+var yAxis = d3.axisLeft(yScale);
 
-    // Crea gli assi x e y
-    var xAxis = d3.axisBottom(xScale)
-      .tickFormat(d3.timeFormat("%d"))
-      .tickSize(0)
-      .tickPadding(8);
-    var yAxis = d3.axisLeft(yScale);
+// Raggruppa il grafico all'interno dei margini
+var g = svg.append("g")
+  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    // Raggruppa il grafico all'interno dei margini
-    var g = svg.append("g")
-     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+// Aggiungi l'asse x
+g.append("g")
+  .attr("class", "x-axis")
+  .attr("transform", "translate(0," + innerHeight + ")")
+  .call(xAxis);
 
-    // Aggiungi l'asse x
-    g.append("g")
-      .attr("class", "x-axis")
-      .attr("transform", "translate(0," + innerHeight + ")")
-      .call(xAxis);
+// Aggiungi l'asse y
+g.append("g")
+  .attr("class", "y-axis")
+  .call(yAxis);
 
-    // Aggiungi l'asse y
-    g.append("g")
-      .attr("class", "y-axis")
-      .call(yAxis);
- 
-    var selectedYear = "";
+var selectedYear = "";
+
+
 // Aggiorna il grafico di Gantt
 function updateGanttChart(filteredData) {
-  // Estrai la lista dei centri trapianti organi
-  var centers = data.map(function(d) { return d.center; });
-  centers = Array.from(new Set(centers)); // Rimuovi i duplicati
 
-  // Estrai la lista degli anni
+  // Estrae la lista dei centri trapianti organi
+  var centers = data.map(function(d) { return d.center; });
+  centers = Array.from(new Set(centers)); // Rimuove i duplicati
+
+  // Estrae la lista degli anni
   var years = data.map(function(d) {
     return new Date(d.startDate).getFullYear();
   });
-  years = Array.from(new Set(years)); // Rimuovi i duplicati
+  years = Array.from(new Set(years)); // Rimuove i duplicati
 
-  // Aggiungi le opzioni degli anni in ordine crescente
+  // Aggiunge le opzioni degli anni in ordine crescente
   years.sort(function(a, b) {
     return a - b;
   });
@@ -84,7 +84,7 @@ function updateGanttChart(filteredData) {
   var yearSelect = document.getElementById("yearSelect");
   yearSelect.innerHTML = ""; // Resetta le opzioni
 
-  // Aggiungi le opzioni degli anni
+  // Aggiunge le opzioni degli anni
   var allYearsOption = document.createElement("option");
   allYearsOption.value = "";
   allYearsOption.text = "Tutti gli anni";
@@ -147,7 +147,7 @@ var filteredBars = g.selectAll(".bar")
     .attr("y", function(d) { return yScale(d.center); })
     .attr("width", function(d) {
       var width = xScale(new Date(d.endDate)) - xScale(new Date(d.startDate));
-      return Math.max(width, 0); // Imposta width a 0 se il valore calcolato è negativo
+      return Math.max(width, 0); 
     })
     
     .attr("height", yScale.bandwidth())
@@ -168,7 +168,6 @@ function getFormattedDate(date, includeYear) {
   return (includeYear ? month + ' ' : '') + year;
 }
 
-
 function filterByYear() {
   var yearSelect = document.getElementById("yearSelect");
   selectedYear = yearSelect.value;
@@ -176,7 +175,7 @@ function filterByYear() {
   if (selectedYear === "") {
     // Se viene selezionata l'opzione "Tutti gli anni", mostra tutti i dati
     filteredData = data;
-    updateGanttChart(); // Rimuovi l'argomento 'data' poiché viene utilizzato il dato filtrato
+    updateGanttChart();
   } else {
     filteredData = data.filter(function(d) {
       return new Date(d.startDate).getFullYear().toString() === selectedYear;
@@ -185,14 +184,8 @@ function filterByYear() {
     // Aggiorna il grafico di Gantt con i dati filtrati
     updateGanttChart(filteredData);
   }
-
-  // Aggiorna il valore dell'opzione selezionata nel campo di selezione
   yearSelect.value = selectedYear;
 }
-
-
-
-
 
 
 // Funzione per controllare il formato del codice fiscale
@@ -278,13 +271,9 @@ function closeTaskModal() {
   modal.style.display = "none";
 }
 
-// Aggiungi un gestore di eventi per il pulsante di chiusura
+// Aggiunge un gestore di eventi per il pulsante di chiusura
 var closeButton = document.getElementById("closeButton");
 closeButton.addEventListener("click", closeTaskModal);
-
-
-
-
 
 
 // Aggiunge un'attività al grafico
@@ -380,8 +369,6 @@ function addTask(event) {
   codiceFiscaleInput.value = '';
   informazioniTrapiantoInput.value = '';
 
-  // Salva i dati nel file JSON
-  // saveDataToJSON();
 }
 
 
@@ -457,8 +444,7 @@ function editTask() {
     codiceFiscaleInput.value = '';
     informazioniTrapiantoInput.value = '';
 
-    // Salva i dati nel file JSON
-    //saveDataToJSON();
+
   } else {
     alert("ID non valido!");
   }
@@ -474,7 +460,7 @@ function deleteTask() {
   });
 
   if (index !== -1) {
-    data.splice(index, 1); // Rimuovi l'attività dall'array dei dati
+    data.splice(index, 1); 
 
     // Aggiorna il grafico di Gantt
     updateGanttChart();
@@ -482,27 +468,26 @@ function deleteTask() {
     // Resetta i campi di input
     idInput.value = '';
 
-    // Salva i dati nel file JSON
-    //saveDataToJSON();
+   
   } else {
     alert("ID non valido!");
   }
 }
 
 
-    // Scarica i dati del grafico in un file JSON
-    function loadDataFromJSON() {
-      d3.json("data.json")
-        .then(function(jsonData) {
-          data = jsonData;
-          updateGanttChart();
-        })
-        .catch(function(error) {
-          console.log("Errore nel caricamento dei dati da JSON:", error);
-        });
-    }
+// Scarica i dati del grafico in un file JSON
+function loadDataFromJSON() {
+  d3.json("data.json")
+    .then(function(jsonData) {
+      data = jsonData;
+      updateGanttChart();
+    })
+    .catch(function(error) {
+      console.log("Errore nel caricamento dei dati da JSON:", error);
+    });
+}
     
-      // Scarica i dati del grafico in un file JSON
+// Scarica i dati del grafico in un file JSON
 function downloadData() {
   var jsonData = JSON.stringify(data, null, 2);
 
@@ -518,26 +503,25 @@ function downloadData() {
 }
 
 
-  // Funzione per salvare i dati inseriti
-  function saveDataToJSON() {
-    downloadData();
-  }
+// Funzione per salvare i dati inseriti
+function saveDataToJSON() {
+  downloadData();
+}
 
-  // Funzione per ottenere il colore dello stato dell'attività
-  function getStatusColor(status) {
-    // Codice per ottenere il colore in base allo stato dell'attività
-    if (status === "Eseguita") {
-      return "#7FFF00";
-    } else if (status === "In elaborazione") {
-      return "#B886FF";
-    } else if (status === "Richiesta") {
-      return "#7EA6E0";
-    } else {
-      return "gray";
-    }
+// Funzione per ottenere il colore dello stato dell'attività
+function getStatusColor(status) {
+  if (status === "Eseguita") {
+    return "#7FFF00";
+  } else if (status === "In elaborazione") {
+    return "#B886FF";
+  } else if (status === "Richiesta") {
+    return "#7EA6E0";
+  } else {
+    return "gray";
   }
+}
 
-  // Carica i dati al caricamento della pagina
-  window.addEventListener('DOMContentLoaded', function() {
-    loadDataFromJSON();
-  });
+// Carica i dati al caricamento della pagina
+window.addEventListener('DOMContentLoaded', function() {
+  loadDataFromJSON();
+});
