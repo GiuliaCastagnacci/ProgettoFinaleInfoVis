@@ -14,19 +14,7 @@ function loadDataFromJSON() {
 
 }
 
-  // function saveDataToJSON() {
-    // var jsonData = JSON.stringify(data, null, 2);
 
-    //var blob = new Blob([jsonData], { type: "application/json" });
-    //var url = URL.createObjectURL(blob);
-
-    //var a = document.createElement("a");
-    //a.href = url;
-    //a.download = "data.json";
-    //a.click();
-
-    //URL.revokeObjectURL(url);
-  // }
 
     // Dimensioni del grafico
     var width = 1000;
@@ -75,110 +63,106 @@ function loadDataFromJSON() {
       .call(yAxis);
  
     var selectedYear = "";
-      
-    // Aggiorna il grafico di Gantt
-  function updateGanttChart(filteredData) {
-    // Estrai la lista dei centri trapianti organi
-    var centers = data.map(function(d) { return d.center; });
-    centers = Array.from(new Set(centers)); // Rimuovi i duplicati
-
-    // Estrai la lista degli anni
-    var years = data.map(function(d) {
-      return new Date(d.startDate).getFullYear();
-    });
-    years = Array.from(new Set(years)); // Rimuovi i duplicati
-
-    // Aggiungi le opzioni degli anni in ordine crescente
-    years.sort(function(a, b) {
-      return a - b;
-    });
-
-
-    // Aggiorna il menu a tendina degli anni
-    var yearSelect = document.getElementById("yearSelect");
-    yearSelect.innerHTML = ""; // Resetta le opzioni
-
-
-    // Aggiungi le opzioni degli anni
-    var allYearsOption = document.createElement("option");
-    allYearsOption.value = "";
-    allYearsOption.text = "Tutti gli anni";
-    yearSelect.add(allYearsOption);
-
-    years.forEach(function(year) {
-      var option = document.createElement("option");
-      option.value = year;
-      option.text = year;
-      yearSelect.add(option);
-    });
-
-      // Filtra i dati in base all'anno selezionato
-    var filtered = filteredData || data;
-
-    // Calcola la data di inizio e la data di fine del periodo che ha degli slot
-    var startDate = d3.min(filtered, function(d) { return new Date(d.startDate); });
-    var endDate = d3.max(filtered, function(d) { return new Date(d.endDate); });
-
-    // Imposta il dominio della scala x solo con il periodo che ha degli slot
-    xScale.domain([startDate, endDate]);
-
-    // Crea la scala y
-    yScale.domain(centers);
-
-    // Aggiorna l'asse x
-    svg.select(".x-axis")
-      .transition()
-      .duration(500)
-      .call(xAxis)
-      .selectAll(".tick text")
-      .attr("transform", "rotate(-45)")
-      .style("text-anchor", "end")
-      .text(function(d) { return getFormattedDate(d); });
-
-    // Aggiorna l'asse y
-    svg.select(".y-axis")
-      .transition()
-      .duration(500)
-      .call(yAxis);
-
-    // Filtra i dati in base all'anno selezionato
-    var filtered = filteredData || data;
-    var filteredBars = g.selectAll(".bar")
-      .data(filtered, function(_, i) { return i; });
-
-    // Aggiorna le barre delle attività filtrate
-    filteredBars.enter()
-      .append("rect")
-      .attr("class", "bar")
-      .attr("data-id", function(d) { return d.id; })
-      .merge(filteredBars)
-      .attr("x", function(d) { return xScale(new Date(d.startDate)); })
-      .attr("y", function(d) { return yScale(d.center); })
-      .attr("width", function(d) { return xScale(new Date(d.endDate)) - xScale(new Date(d.startDate)); })
-      .attr("height", yScale.bandwidth())
-      .attr("fill", function(d) { return getStatusColor(d.activity); })
-      .on("click", function() {
-        var id = d3.select(this).attr("data-id");
-        showTaskInfo(id);
-      });
-
-    filteredBars.exit().remove();
-}
-
-
-// Formatta data grafico Gantt
-  function getFormattedDate(date) {
+// Funzione per formattare la data nel grafico di Gantt
+function getFormattedDate(date, includeYear) {
   var day = date.getDate();
   var monthNames = ["Gen", "Feb", "Mar", "Apr", "Mag", "Giu", "Lug", "Ago", "Set", "Ott", "Nov", "Dic"];
   var month = monthNames[date.getMonth()];
-  var year = date.getFullYear();
+  var year = includeYear ? date.getFullYear() : '';
   return day.toString().padStart(2, '0') + '\n' + month + '\n' + year;
 }
 
+// Aggiorna il grafico di Gantt
+function updateGanttChart(filteredData) {
+  // Estrai la lista dei centri trapianti organi
+  var centers = data.map(function(d) { return d.center; });
+  centers = Array.from(new Set(centers)); // Rimuovi i duplicati
 
+  // Estrai la lista degli anni
+  var years = data.map(function(d) {
+    return new Date(d.startDate).getFullYear();
+  });
+  years = Array.from(new Set(years)); // Rimuovi i duplicati
+
+  // Aggiungi le opzioni degli anni in ordine crescente
+  years.sort(function(a, b) {
+    return a - b;
+  });
+
+  // Aggiorna il menu a tendina degli anni
+  var yearSelect = document.getElementById("yearSelect");
+  yearSelect.innerHTML = ""; // Resetta le opzioni
+
+  // Aggiungi le opzioni degli anni
+  var allYearsOption = document.createElement("option");
+  allYearsOption.value = "";
+  allYearsOption.text = "Tutti gli anni";
+  yearSelect.add(allYearsOption);
+
+  years.forEach(function(year) {
+    var option = document.createElement("option");
+    option.value = year;
+    option.text = year;
+    yearSelect.add(option);
+  });
+
+  // Filtra i dati in base all'anno selezionato
+  var filtered = filteredData || data;
+
+  // Calcola la data di inizio e la data di fine del periodo che ha degli slot
+  var startDate = d3.min(filtered, function(d) { return new Date(d.startDate); });
+  var endDate = d3.max(filtered, function(d) { return new Date(d.endDate); });
+
+  // Imposta il dominio della scala x solo con il periodo che ha degli slot
+  xScale.domain([startDate, endDate]);
+
+  // Crea la scala y
+  yScale.domain(centers);
+
+  // Aggiorna l'asse x
+  svg.select(".x-axis")
+    .transition()
+    .duration(500)
+    .call(xAxis)
+    .selectAll(".tick text")
+    .attr("transform", "rotate(-45)")
+    .style("text-anchor", "end")
+    .text(function(d) { return getFormattedDate(d, selectedYear === ""); });
+
+  // Aggiorna l'asse y
+  svg.select(".y-axis")
+    .transition()
+    .duration(500)
+    .call(yAxis);
+
+  // Filtra i dati in base all'anno selezionato
+  var filtered = filteredData || data;
+  var filteredBars = g.selectAll(".bar")
+    .data(filtered, function(_, i) { return i; });
+
+  // Aggiorna le barre delle attività filtrate
+  filteredBars.enter()
+    .append("rect")
+    .attr("class", "bar")
+    .attr("data-id", function(d) { return d.id; })
+    .merge(filteredBars)
+    .attr("x", function(d) { return xScale(new Date(d.startDate)); })
+    .attr("y", function(d) { return yScale(d.center); })
+    .attr("width", function(d) { return xScale(new Date(d.endDate)) - xScale(new Date(d.startDate)); })
+    .attr("height", yScale.bandwidth())
+    .attr("fill", function(d) { return getStatusColor(d.activity); })
+    .on("click", function() {
+      var id = d3.select(this).attr("data-id");
+      showTaskInfo(id);
+    });
+
+  filteredBars.exit().remove();
+}
+
+// Filtra i dati per anno
 function filterByYear() {
   var yearSelect = document.getElementById("yearSelect");
-  var selectedYear = yearSelect.value;
+  selectedYear = yearSelect.value;
 
   if (selectedYear === "") {
     // Se viene selezionata l'opzione "Tutti gli anni", mostra tutti i dati
@@ -195,10 +179,6 @@ function filterByYear() {
   // Aggiorna il valore dell'opzione selezionata nel campo di selezione
   yearSelect.value = selectedYear;
 }
-
-
-
-
 
 
 
