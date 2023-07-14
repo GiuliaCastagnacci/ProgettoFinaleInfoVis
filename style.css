@@ -108,8 +108,8 @@ body {
 
 .legend-wrapper {
   position: absolute;
-  top: 100px; /* Regola la posizione verticale come desiderato */
-  right: 40px; /* Regola la posizione orizzontale come desiderato */
+  top: 100px; 
+  right: 40px; 
 }
 
 .legend {
@@ -119,14 +119,14 @@ body {
 }
 
 .legend li {
-  margin-bottom: 8px; /* Regola lo spazio tra le voci della legenda come desiderato */
+  margin-bottom: 8px; 
 }
 
 .legend-color {
   display: inline-block;
   width: 10px;
   height: 10px;
-  margin-right: 5px; /* Regola lo spazio tra il colore e l'etichetta come desiderato */
+  margin-right: 5px; 
 }
 
 
@@ -216,9 +216,9 @@ body {
   z-index: 9999;
 }
 
-/* Stile per la finestra modale */
+
 .modal {
-  display: none; /* Nasconde la finestra modale per impostazione predefinita */
+  display: none; 
   position: fixed;
   z-index: 1;
   left: 0;
@@ -226,7 +226,7 @@ body {
   width: 100%;
   height: 100%;
   overflow: auto;
-  background-color: rgba(0, 0, 0, 0.5); /* Sfondo semitrasparente */
+  background-color: rgba(0, 0, 0, 0.5); 
 }
 
 .modal-content {
@@ -258,14 +258,14 @@ body {
 }
 
 .logo-info {
-  width: 30px; /* Imposta la larghezza desiderata per il logo */
-  height: 30px; /* Imposta l'altezza desiderata per il logo */
-  vertical-align: middle; /* Allinea verticalmente l'immagine */
-  margin-right: 10px; /* Aggiungi uno spazio a destra tra il logo e il testo */
+  width: 30px; 
+  height: 30px; 
+  vertical-align: middle; 
+  margin-right: 10px; 
 }
 
 .info p {
   margin: 0;
-  display: inline-block; /* Impedisce al testo di andare a capo */
-  vertical-align: middle; /* Allinea verticalmente il testo */
+  display: inline-block; 
+  vertical-align: middle;
 }
