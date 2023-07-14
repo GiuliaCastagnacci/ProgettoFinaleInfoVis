@@ -244,3 +244,27 @@ body {
   align-items: flex-start;
   
 }
+
+.info {
+  background-color: #f8f8f8;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-top: -50px;
+  text-align: center;
+  width: 400px;
+  margin-left: 400px;
+}
+
+.logo-info {
+  width: 30px; /* Imposta la larghezza desiderata per il logo */
+  height: 30px; /* Imposta l'altezza desiderata per il logo */
+  vertical-align: middle; /* Allinea verticalmente l'immagine */
+  margin-right: 10px; /* Aggiungi uno spazio a destra tra il logo e il testo */
+}
+
+.info p {
+  margin: 0;
+  display: inline-block; /* Impedisce al testo di andare a capo */
+  vertical-align: middle; /* Allinea verticalmente il testo */
+}
