@@ -88,6 +88,12 @@ function loadDataFromJSON() {
     });
     years = Array.from(new Set(years)); // Rimuovi i duplicati
 
+    // Aggiungi le opzioni degli anni in ordine crescente
+    years.sort(function(a, b) {
+      return a - b;
+    });
+
+
     // Aggiorna il menu a tendina degli anni
     var yearSelect = document.getElementById("yearSelect");
     yearSelect.innerHTML = ""; // Resetta le opzioni
@@ -159,34 +165,6 @@ function loadDataFromJSON() {
     filteredBars.exit().remove();
 }
 
-
-  // Crea la legenda
-var legend = svg.append("g")
-  .attr("class", "legend")
-  .attr("transform", "translate(" + (innerWidth + margin.right) + "," + margin.top + ")");
-
-var legendData = [
-  { label: "Eseguita", color: "#7FFF00" },
-  { label: "In elaborazione", color: "#B886FF" },
-  { label: "Richiesta", color: "#7EA6E0" }
-];
-
-var legendItem = legend.selectAll(".legend-item")
-  .data(legendData)
-  .enter()
-  .append("g")
-  .attr("class", "legend-item")
-  .attr("transform", function(d, i) { return "translate(0," + (i * 20) + ")"; });
-
-legendItem.append("rect")
-  .attr("width", 10)
-  .attr("height", 10)
-  .attr("fill", function(d) { return d.color; });
-
-legendItem.append("text")
-  .attr("x", 20)
-  .attr("y", 8)
-  .text(function(d) { return d.label; });
 
 // Formatta data grafico Gantt
   function getFormattedDate(date) {

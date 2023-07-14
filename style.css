@@ -96,11 +96,43 @@ body {
 
 .download-button {
   position: relative;
-  top: -80px;
+  top: -10px;
   left: -20px;
 }
 
+.select-and-button {
+  display: flex;
+  align-items: center;
+}
+
+.legend-wrapper {
+  position: absolute;
+  top: 100px; /* Regola la posizione verticale come desiderato */
+  right: 40px; /* Regola la posizione orizzontale come desiderato */
+}
+
+.legend {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.legend li {
+  margin-bottom: 8px; /* Regola lo spazio tra le voci della legenda come desiderato */
+}
+
+.legend-color {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 5px; /* Regola lo spazio tra il colore e l'etichetta come desiderato */
+}
+
+
+
 .all-years-option {
+  top: -10px;
+  left: -30px;
   align-items: center;
   appearance: none;
   background-color: #4F58FD;

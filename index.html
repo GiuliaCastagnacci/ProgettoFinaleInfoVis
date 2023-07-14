@@ -52,11 +52,19 @@
     </div>
     <div class="chart-container-wrapper">
       <div class="chart-container" id="ganttChart"></div>
+      <div class="legend-wrapper">
+        <ul class="legend">
+          <li><span class="legend-color" style="background-color: #7FFF00;"></span>Eseguita</li>
+          <li><span class="legend-color" style="background-color: #B886FF;"></span>In elaborazione</li>
+          <li><span class="legend-color" style="background-color: #7EA6E0;"></span>Richiesta</li>
+        </ul>
+      </div>
       <select id="yearSelect" class="all-years-option" onchange="filterByYear()">
-        <option value="" >Tutti gli anni</option>
+        <option value="">Tutti gli anni</option>
       </select>
       <button class="button download-button" onclick="downloadData()">Scarica dati</button>
     </div>
+    
     
     
   </div>
