@@ -611,7 +611,7 @@
         "codiceFiscale": "TPCVBP70E05H321B",
         "informazioniTrapianto": "Sala operatoria: Sala 1B, Tipo di trapianto: Trapianto di cornea, Gruppo sanguigno del donatore: A-, Gruppo sanguigno del ricevente: A-"
     },
-     {
+    {
         "center": "Ospedale Maggiore",
         "startDate": "2022-07-05",
         "endDate": "2022-07-10",
@@ -1630,5 +1630,3 @@
     }
 
 ]
-
-

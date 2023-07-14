@@ -1,4 +1,5 @@
 var data = [];
+var filteredData = [];
 
 function loadDataFromJSON() {
   d3.json("data.json").then(function(jsonData) {
@@ -132,9 +133,9 @@ function updateGanttChart(filteredData) {
     .call(yAxis);
 
   // Filtra i dati in base all'anno selezionato
-  var filtered = filteredData || data;
-  var filteredBars = g.selectAll(".bar")
-    .data(filtered, function(_, i) { return i; });
+var filtered = filteredData || data;
+var filteredBars = g.selectAll(".bar")
+  .data(filtered, function(d) { return d.id; });
 
   // Aggiorna le barre delle attività filtrate
   filteredBars.enter()
@@ -144,7 +145,11 @@ function updateGanttChart(filteredData) {
     .merge(filteredBars)
     .attr("x", function(d) { return xScale(new Date(d.startDate)); })
     .attr("y", function(d) { return yScale(d.center); })
-    .attr("width", function(d) { return xScale(new Date(d.endDate)) - xScale(new Date(d.startDate)); })
+    .attr("width", function(d) {
+      var width = xScale(new Date(d.endDate)) - xScale(new Date(d.startDate));
+      return Math.max(width, 0); // Imposta width a 0 se il valore calcolato è negativo
+    })
+    
     .attr("height", yScale.bandwidth())
     .attr("fill", function(d) { return getStatusColor(d.activity); })
     .on("click", function() {
@@ -164,16 +169,16 @@ function getFormattedDate(date, includeYear) {
 }
 
 
-// Filtra i dati per anno
 function filterByYear() {
   var yearSelect = document.getElementById("yearSelect");
   selectedYear = yearSelect.value;
 
   if (selectedYear === "") {
     // Se viene selezionata l'opzione "Tutti gli anni", mostra tutti i dati
-    updateGanttChart(data);
+    filteredData = data;
+    updateGanttChart(); // Rimuovi l'argomento 'data' poiché viene utilizzato il dato filtrato
   } else {
-    var filteredData = data.filter(function(d) {
+    filteredData = data.filter(function(d) {
       return new Date(d.startDate).getFullYear().toString() === selectedYear;
     });
 
@@ -184,6 +189,7 @@ function filterByYear() {
   // Aggiorna il valore dell'opzione selezionata nel campo di selezione
   yearSelect.value = selectedYear;
 }
+
 
 
 
@@ -215,9 +221,18 @@ function isCodiceFiscaleAlreadyUsed(codiceFiscale) {
 
 // Funzione per aprire la finestra modale e visualizzare le informazioni dell'attività
 function showTaskInfo(id) {
-  var task = data.find(function(d) {
-    return d.id === id;
-  });
+  var task;
+  if (selectedYear === "") {
+    // Se viene selezionata l'opzione "Tutti gli anni", utilizza il dataset completo 'data'
+    task = data.find(function(d) {
+      return d.id === id;
+    });
+  } else {
+    // Altrimenti, utilizza il dataset filtrato 'filteredData' per l'anno selezionato
+    task = filteredData.find(function(d) {
+      return d.id === id;
+    });
+  }
 
   if (task) {
     var modal = document.getElementById("taskModal");
