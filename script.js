@@ -63,15 +63,6 @@ function loadDataFromJSON() {
       .call(yAxis);
  
     var selectedYear = "";
-// Funzione per formattare la data nel grafico di Gantt
-function getFormattedDate(date, includeYear) {
-  var day = date.getDate();
-  var monthNames = ["Gen", "Feb", "Mar", "Apr", "Mag", "Giu", "Lug", "Ago", "Set", "Ott", "Nov", "Dic"];
-  var month = monthNames[date.getMonth()];
-  var year = includeYear ? date.getFullYear() : '';
-  return day.toString().padStart(2, '0') + '\n' + month + '\n' + year;
-}
-
 // Aggiorna il grafico di Gantt
 function updateGanttChart(filteredData) {
   // Estrai la lista dei centri trapianti organi
@@ -127,7 +118,13 @@ function updateGanttChart(filteredData) {
     .selectAll(".tick text")
     .attr("transform", "rotate(-45)")
     .style("text-anchor", "end")
-    .text(function(d) { return getFormattedDate(d, selectedYear === ""); });
+    .text(function(d) {
+      if (selectedYear === "") {
+        return d3.timeFormat("%b %Y")(d);  // Mostra solo il mese e l'anno
+      } else {
+        return d3.timeFormat("%b")(d);  // Mostra solo il mese
+      }
+    });
 
   // Aggiorna l'asse y
   svg.select(".y-axis")
@@ -158,6 +155,15 @@ function updateGanttChart(filteredData) {
 
   filteredBars.exit().remove();
 }
+
+// Funzione per formattare la data nel grafico di Gantt
+function getFormattedDate(date, includeYear) {
+  var monthNames = ["Gen", "Feb", "Mar", "Apr", "Mag", "Giu", "Lug", "Ago", "Set", "Ott", "Nov", "Dic"];
+  var month = monthNames[date.getMonth()];
+  var year = includeYear ? date.getFullYear() : '';
+  return (includeYear ? month + ' ' : '') + year;
+}
+
 
 // Filtra i dati per anno
 function filterByYear() {
