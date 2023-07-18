@@ -2,7 +2,7 @@ var data = [];
 var filteredData = [];
 
 function loadDataFromJSON() {
-  d3.json("data.json").then(function(jsonData) {
+  d3.json("data2.json").then(function(jsonData) {
     data = jsonData;
     updateGanttChart(data); // Passa l'intero array dei dati
     showTaskInfo(0);
@@ -14,8 +14,8 @@ function loadDataFromJSON() {
 }
 
 // Dimensioni del grafico
-var width = 900;
-var height = 400;
+var width = 920;
+var height = 500;
 
 // Margini del grafico
 var margin = { top: 20, right: 30, bottom: 50, left: 120 };
@@ -152,6 +152,7 @@ var filteredBars = g.selectAll(".bar")
     
     .attr("height", yScale.bandwidth())
     .attr("fill", function(d) { return getStatusColor(d.activity); })
+    .attr("data-codice-trapianto", function(d) { return d["Codice Trapianto"]; })
     .on("click", function() {
       var id = d3.select(this).attr("data-id");
       showTaskInfo(id);
@@ -276,6 +277,27 @@ var closeButton = document.getElementById("closeButton");
 closeButton.addEventListener("click", closeTaskModal);
 
 
+// evidenzia slot con stesso codice trapianto
+function highlightSlots() {
+  var codiceTrapiantoInput = document.getElementById("codiceTrapiantoInputHighlight");
+  var codiceTrapianto = codiceTrapiantoInput.value.trim();
+
+  var slots = g.selectAll(".bar")
+    .classed("highlight", function(d) {
+      return d["Codice Trapianto"] === codiceTrapianto;
+    });
+
+  var warningMessage = document.getElementById("warningMessage");
+
+  if (slots.size() === 0) {
+    warningMessage.style.display = "block";
+  } else {
+    warningMessage.style.display = "none";
+  }
+}
+
+
+
 // Aggiunge un'attività al grafico
 function addTask(event) {
   event.preventDefault();
@@ -293,7 +315,7 @@ function addTask(event) {
   var informazioniTrapiantoInput = document.getElementById('informazioniTrapiantoInput');
 
   if (startDate.getFullYear().toString().length > 4 || endDate.getFullYear().toString().length > 4) {
-    alert("anno inserito non valido, inserisci solo 4 cifre");
+    alert("Anno inserito non valido, inserisci solo 4 cifre");
     return; // Esce dalla funzione senza aggiungere l'attività
   }
 
@@ -417,7 +439,7 @@ function editTask() {
     });
 
     if (isSlotOccupied) {
-      alert("Le nuove date si sovrappongono ad altre attività per il centro selezionato");
+      alert("Le nuove date si sovrappongono ad altre attivita' per il centro selezionato");
       return;
     }
 
@@ -477,7 +499,7 @@ function deleteTask() {
 
 // Scarica i dati del grafico in un file JSON
 function loadDataFromJSON() {
-  d3.json("data.json")
+  d3.json("data2.json")
     .then(function(jsonData) {
       data = jsonData;
       updateGanttChart();

@@ -35,11 +35,21 @@
           <option value="Policlinico Umberto I">Policlinico Umberto I</option>
           <option value="Ospedale San Martino">Ospedale San Martino</option>
         </select><br>
-        <label>Id:</label>
+      </select><br>
+      <label>Sala Operatoria:</label>
+      <select id="salaSelect" required>
+        <option value="Sala -">-</option>
+        <option value="Sala A">Sala A</option>
+        <option value="Sala B">Sala B</option>
+        <option value="Sala C">Sala C</option>
+      </select><br>
+        <label>Id attivit&#224;:</label>
         <input type="text" id="idInput" required><br>
+        <label>Codice Trapianto:</label>
+        <input type="text" id="codiceTrapiantoInput" required><br>
         <label>Codice Fiscale Paziente:</label>
         <input type="text" id="codiceFiscaleInput" required><br>
-        <label>Informazioni sul trapianto:</label>
+        <label>Informazioni aggiuntive:</label>
         <textarea id="informazioniTrapiantoInput" rows="4" cols="50" required></textarea><br>
         <div class="button-container"></div>
           <button class="button" type="submit">Aggiungi</button>
@@ -63,11 +73,20 @@
         <option value="">Tutti gli anni</option>
       </select>
       <button class="button download-button" onclick="downloadData()">Scarica dati</button>
+    
     </div>
+    
     
     <div class="info">
       <img src="info.png" alt="Logo" class="logo-info">
       Per eliminare un'attivit&#224; &#232; sufficiente inserire l'ID.
+    </div>
+    
+    <div class="codiceTrapianto">
+      <label>Inserire il codice Trapianto da visualizzare:</label>
+      <input type="text" id="codiceTrapiantoInputHighlight" required>
+      <button id="highlightButton" onclick="highlightSlots()">Evidenzia Slot</button>
+      <div id="warningMessage" style="display: none;">Codice trapianto selezionato non esiste</div>  
     </div>
     
   </div>
