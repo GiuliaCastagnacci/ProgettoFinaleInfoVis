@@ -15,7 +15,7 @@ function loadDataFromJSON() {
 
 // Dimensioni del grafico
 var width = 920;
-var height = 500;
+var height = 400;
 
 // Margini del grafico
 var margin = { top: 20, right: 30, bottom: 50, left: 120 };
@@ -233,11 +233,16 @@ function showTaskInfo(id) {
     var modalContent = document.getElementById("modalContent");
     modalContent.innerHTML = ""; // Resetta il contenuto della finestra modale
 
+    
+    // Aggiungi le informazioni dell'attività alla finestra modale
     var idElement = document.createElement("p");
     idElement.innerHTML = "<strong>ID:</strong> " + task.id;
     modalContent.appendChild(idElement);
     
-    // Aggiungi le informazioni dell'attività alla finestra modale
+    var codiceTrapianto = document.createElement("p");
+    codiceTrapianto.innerHTML = "<strong>Codice Trapianto:</strong> " + task["Codice Trapianto"];
+    modalContent.appendChild(codiceTrapianto);
+    
     var center = document.createElement("p");
     center.innerHTML = "<strong>Centro:</strong> " + task.center;
     modalContent.appendChild(center);
@@ -258,9 +263,7 @@ function showTaskInfo(id) {
     codiceFiscale.innerHTML = "<strong>Codice fiscale:</strong> " + task.codiceFiscale;
     modalContent.appendChild(codiceFiscale);
 
-    var informazioniTrapianto = document.createElement("p");
-    informazioniTrapianto.innerHTML = "<strong>Informazioni trapianto:</strong> " + task.informazioniTrapianto;
-    modalContent.appendChild(informazioniTrapianto);
+    
 
     modal.style.display = "block";
   }
@@ -349,10 +352,10 @@ function addTask(event) {
     alert("Il codice fiscale inserito non e' valido.");
     return; // Esce dalla funzione senza aggiungere l'attività
   }
-  if (isCodiceFiscaleAlreadyUsed(codiceFiscale)) {
-    alert("Il codice fiscale inserito e' gia' presente in un altro time slot. Inserire un codice fiscale unico.");
-    return; // Esce dalla funzione senza aggiungere l'attività
-  }
+  //if (isCodiceFiscaleAlreadyUsed(codiceFiscale)) {
+  //  alert("Il codice fiscale inserito e' gia' presente in un altro time slot. Inserire un codice fiscale unico.");
+  //  return; // Esce dalla funzione senza aggiungere l'attività
+  //}
 
   var id = idInput.value.trim();
   if (isIdAlreadyUsed(id)) {
@@ -360,6 +363,29 @@ function addTask(event) {
     return; // Esce dalla funzione senza aggiungere l'attività
   }
 
+  // Verifica se l'attività corrente può essere aggiunta sequenzialmente rispetto all'ultima attività inserita
+  if (data.length > 0) {
+    var lastTask = data[data.length - 1];
+    var lastActivity = lastTask.activity;
+
+    // Verifica se l'attività corrente può essere aggiunta sequenzialmente rispetto all'ultima attività
+    if (
+      (lastActivity === "Richiesta" && activitySelect.value === "Prelievo") ||
+      (lastActivity === "Prelievo" && activitySelect.value === "Analisi") ||
+      (lastActivity === "Analisi" && activitySelect.value === "Trapianto") ||
+      (lastActivity === "Trapianto" && activitySelect.value === "Monitoraggio") ||
+      (lastActivity === "Monitoraggio" && activitySelect.value === "Monitoraggio")
+    ) {
+      // Verifica se l'attività corrente richiede lo stesso codice trapianto dell'ultima attività
+      if (activitySelect.value !== "Richiesta" && lastTask["Codice Trapianto"] !== codiceTrapiantoInput.value) {
+        alert("L'attività corrente richiede lo stesso codice trapianto dell'ultima attività inserita.");
+        return; // Esce dalla funzione senza aggiungere l'attività
+      }
+    } else {
+      alert("L'attività corrente deve seguire sequenzialmente l'ultima attività inserita.");
+      return; // Esce dalla funzione senza aggiungere l'attività
+    }
+  }
 
   var task = {
     id: idInput.value.trim(),
@@ -368,7 +394,7 @@ function addTask(event) {
     endDate: endDateInput.value,
     activity: activitySelect.value,
     codiceFiscale: codiceFiscale,
-    informazioniTrapianto: informazioniTrapiantoInput.value.trim()
+    "Codice Trapianto": codiceTrapiantoInput.value.trim()
   };
   
 
@@ -381,6 +407,7 @@ function addTask(event) {
     data.push(task);
   }
 
+  data.push(task);
   // Aggiorna il grafico di Gantt
   updateGanttChart();
 
@@ -389,7 +416,7 @@ function addTask(event) {
   endDateInput.value = '';
   idInput.value = '';
   codiceFiscaleInput.value = '';
-  informazioniTrapiantoInput.value = '';
+  
 
 }
 
@@ -532,13 +559,18 @@ function saveDataToJSON() {
 
 // Funzione per ottenere il colore dello stato dell'attività
 function getStatusColor(status) {
-  if (status === "Eseguita") {
+  if (status === "Richiesta") {
     return "#7FFF00";
-  } else if (status === "In elaborazione") {
+  } else if (status === "Prelievo") {
     return "#B886FF";
-  } else if (status === "Richiesta") {
-    return "#7EA6E0";
-  } else {
+  } else if (status === "Analisi") {
+    return "#d47eee";
+  } else if (status === "Trapianto") {
+    return "#fff176";
+  } else if (status === "Monitoraggio") {
+    return "#7af5d2";
+  } 
+  else {
     return "gray";
   }
 }
