@@ -373,7 +373,7 @@ function addTask(event) {
 
     if (activitySelect.value !== firstActivity) {
       // L'attività corrente non è la prima attività della sequenza
-      alert("L'attività corrente deve iniziare dalla prima attività della sequenza (" + firstActivity + ").");
+      alert("L'attività corrente deve iniziare dalla prima attivita' della sequenza (" + firstActivity + ").");
       return;
     }
   }
@@ -441,15 +441,8 @@ function addTask(event) {
 
 
 
-
-
-
-
-
-
-
-
-function editTask() {
+// Modifica attività prima versione
+/*function editTask() {
   var idInput = document.getElementById('idInput');
   var id = idInput.value.trim();
 
@@ -478,32 +471,24 @@ function editTask() {
       return;
     }
 
-    // Verifica se le nuove date si sovrappongono ad altre attività per il centro selezionato
-    var isSlotOccupied = data.some(function(task) {
-      if (task.id !== id && task.center === centerSelect.value) {
-        var taskStartDate = new Date(task.startDate);
-        var taskEndDate = new Date(task.endDate);
-
-        return (
-          (newStartDate >= taskStartDate && newStartDate <= taskEndDate) ||
-          (newEndDate >= taskStartDate && newEndDate <= taskEndDate) ||
-          (newStartDate <= taskStartDate && newEndDate >= taskEndDate)
-        );
-      }
-      return false;
-    });
-
-    if (isSlotOccupied) {
-      alert("Le nuove date si sovrappongono ad altre attivita' per il centro selezionato");
-      return;
-    }
-
     var codiceFiscale = codiceFiscaleInput.value.trim();
     if (!isCodiceFiscaleValid(codiceFiscale)) {
       alert("Il codice fiscale inserito non è valido.");
       return;
     }
 
+    // Verifica se il tipo di attività può essere modificato
+    var lastTask = data[data.length - 1];
+    var lastActivity = lastTask.activity;
+    var currentActivityIndex = sequence.indexOf(activitySelect.value);
+    var lastActivityIndex = sequence.indexOf(lastActivity);
+
+    if (currentActivityIndex !== lastActivityIndex) {
+      alert("È possibile modificare soltanto l'ultima attività della sequenza con lo stesso tipo dell'attività precedente.");
+      return;
+    }
+
+    // Aggiorna i valori dell'attività selezionata
     selectedTask.startDate = startDateInput.value;
     selectedTask.endDate = endDateInput.value;
     selectedTask.activity = activitySelect.value;
@@ -520,12 +505,63 @@ function editTask() {
     idInput.value = '';
     codiceFiscaleInput.value = '';
     informazioniTrapiantoInput.value = '';
-
-
   } else {
     alert("ID non valido!");
   }
+} */
+
+
+// Modifica attività seconda versione
+function editTask() {
+  var idInput = document.getElementById('idInput');
+  var codiceTrapiantoInput = document.getElementById('codiceTrapiantoInput');
+  var centerSelect = document.getElementById('centerSelect');
+
+  var id = idInput.value.trim();
+  var codiceTrapianto = codiceTrapiantoInput.value.trim();
+  var newCenter = centerSelect.value;
+
+  var selectedTask = data.find(function(task) {
+    return task.id === id && task["Codice Trapianto"] === codiceTrapianto;
+  });
+
+  if (selectedTask) {
+    var startDate = new Date(selectedTask.startDate);
+    var endDate = new Date(selectedTask.endDate);
+
+    // Verifica se le nuove date si sovrappongono ad altre attività per il nuovo centro
+    var isSlotOccupied = data.some(function(task) {
+      return (
+        task.center === newCenter &&
+        (
+          (startDate >= new Date(task.startDate) && startDate <= new Date(task.endDate)) ||
+          (endDate >= new Date(task.startDate) && endDate <= new Date(task.endDate)) ||
+          (startDate <= new Date(task.startDate) && endDate >= new Date(task.endDate))
+        )
+      );
+    });
+
+    if (isSlotOccupied) {
+      alert("In queste date il centro e' occupato");
+      return;
+    }
+
+    selectedTask.center = newCenter;
+
+    // Aggiorna il grafico di Gantt
+    updateGanttChart();
+
+    // Resetta il campo di input per il centro
+    centerSelect.value = '';
+
+    // Resetta gli altri campi di input
+    idInput.value = '';
+    codiceTrapiantoInput.value = '';
+  } else {
+    alert("ID o Codice Trapianto non validi!");
+  }
 }
+
 
 
 function deleteTask() {

@@ -253,7 +253,7 @@ body {
   border-radius: 5px;
   margin-top: -60px;
   text-align: center;
-  width: 400px;
+  width: 760px;
   margin-left: 400px;
 }
 
@@ -287,3 +287,7 @@ body {
   stroke-width: 2px; 
 }
 
+#codiceTrapiantoInputHighlight {
+  width: 120px;
+  border: 1px solid #4F58FD;
+}
