@@ -354,7 +354,7 @@ function addTask(event) {
 
   var id = idInput.value.trim();
   if (isIdAlreadyUsed(id)) {
-    alert("L'ID inserito è già utilizzato in un altro time slot. Scegliere un ID unico.");
+    alert("L'ID inserito e' già utilizzato in un altro time slot. Scegliere un ID unico.");
     return;
   }
 
@@ -363,12 +363,22 @@ function addTask(event) {
   if (data.length > 0) {
     var lastTask = data[data.length - 1];
     var lastActivity = lastTask.activity;
+    var lastEndDate = new Date(lastTask.endDate);
 
     var currentActivityIndex = sequence.indexOf(activitySelect.value);
     var lastActivityIndex = sequence.indexOf(lastActivity);
 
     if (activitySelect.value === lastActivity) {
       // L'attività corrente è uguale all'ultima attività presente
+      // Controlliamo la sequenzialità delle date
+      var startDate = new Date(startDateInput.value);
+
+      if (startDate <= lastEndDate) {
+        // La data di inizio dell'attività corrente deve essere successiva alla data di fine dell'ultima attività
+        alert("La data di inizio dell'attivita' deve essere successiva alla data di fine dell'ultima attivita'.");
+        return;
+      }
+
       // Possiamo aggiungere l'attività corrente
     } else if (currentActivityIndex === lastActivityIndex + 1) {
       // L'attività corrente è successiva all'ultima attività presente nel flusso sequenziale
@@ -376,11 +386,11 @@ function addTask(event) {
     } else if (currentActivityIndex === lastActivityIndex - 1) {
       // L'attività corrente è precedente all'ultima attività presente nel flusso sequenziale
       // Non possiamo aggiungere l'attività corrente
-      alert("L'attivit&#224; corrente deve seguire sequenzialmente l'ultima attivit&#224; inserita.");
+      alert("L'attivita' corrente deve seguire sequenzialmente l'ultima attivita' inserita.");
       return;
     } else {
       // L'attività corrente non soddisfa le condizioni per l'inserimento
-      alert("L'attivit&#224; corrente deve seguire sequenzialmente l'ultima attivit&#224; inserita.");
+      alert("L'attivita' corrente deve seguire sequenzialmente l'ultima attivita' inserita.");
       return;
     }
   }
@@ -407,6 +417,11 @@ function addTask(event) {
   codiceFiscaleInput.value = '';
   codiceTrapiantoInput.value = '';
 }
+
+
+
+
+
 
 
 
