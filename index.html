@@ -23,9 +23,11 @@
         <input type="date" id="endDateInput" required><br>
         <label>Tipo di attivit&#224;:</label>
         <select id="activitySelect" required>
-          <option value="Eseguita">Eseguita</option>
-          <option value="In elaborazione">In elaborazione</option>
           <option value="Richiesta">Richiesta</option>
+          <option value="Prelievo">Prelievo</option>
+          <option value="Analisi">Analisi</option>
+          <option value="Trapianto">Trapianto</option>
+          <option value="Monitoraggio">Monitoraggio</option>
         </select><br>
         <label>Centro:</label>
         <select id="centerSelect" required>
@@ -36,12 +38,6 @@
           <option value="Ospedale San Martino">Ospedale San Martino</option>
         </select><br>
       </select><br>
-      <label>Sala Operatoria:</label>
-      <select id="salaSelect" required>
-        <option value="Sala -">-</option>
-        <option value="Sala A">Sala A</option>
-        <option value="Sala B">Sala B</option>
-        <option value="Sala C">Sala C</option>
       </select><br>
         <label>Id attivit&#224;:</label>
         <input type="text" id="idInput" required><br>
@@ -49,8 +45,6 @@
         <input type="text" id="codiceTrapiantoInput" required><br>
         <label>Codice Fiscale Paziente:</label>
         <input type="text" id="codiceFiscaleInput" required><br>
-        <label>Informazioni aggiuntive:</label>
-        <textarea id="informazioniTrapiantoInput" rows="4" cols="50" required></textarea><br>
         <div class="button-container"></div>
           <button class="button" type="submit">Aggiungi</button>
           <button class="button" onclick="editTask()">Modifica</button>
@@ -64,9 +58,11 @@
       <div class="chart-container" id="ganttChart"></div>
       <div class="legend-wrapper">
         <ul class="legend">
-          <li><span class="legend-color" style="background-color: #7FFF00;"></span>Eseguita</li>
-          <li><span class="legend-color" style="background-color: #B886FF;"></span>In elaborazione</li>
-          <li><span class="legend-color" style="background-color: #7EA6E0;"></span>Richiesta</li>
+          <li><span class="legend-color" style="background-color: #7FFF00;"></span>Richiesta</li>
+          <li><span class="legend-color" style="background-color: #B886FF;"></span>Prelievo</li>
+          <li><span class="legend-color" style="background-color: #d47eee;"></span>Analisi</li>
+          <li><span class="legend-color" style="background-color: #fff176;"></span>Trapianto</li>
+          <li><span class="legend-color" style="background-color: #7af5d2;"></span>Monitoraggio</li>
         </ul>
       </div>
       <select id="yearSelect" class="all-years-option" onchange="filterByYear()">
@@ -85,7 +81,7 @@
     <div class="codiceTrapianto">
       <label>Inserire il codice Trapianto da visualizzare:</label>
       <input type="text" id="codiceTrapiantoInputHighlight" required>
-      <button id="highlightButton" onclick="highlightSlots()">Evidenzia Slot</button>
+      <button id="highlightButton" class="all-years-option" onclick="highlightSlots()">Cerca</button>
       <div id="warningMessage" style="display: none;">Codice trapianto selezionato non esiste</div>  
     </div>
     
