@@ -310,12 +310,13 @@ function addTask(event) {
   var activitySelect = document.getElementById('activitySelect');
   var centerSelect = document.getElementById('centerSelect');
   var idInput = document.getElementById('idInput');
+  var codiceTrapiantoInput = document.getElementById('codiceTrapiantoInput');
+
 
   var startDate = new Date(startDateInput.value);
   var endDate = new Date(endDateInput.value);
 
   var codiceFiscaleInput = document.getElementById('codiceFiscaleInput');
-  var informazioniTrapiantoInput = document.getElementById('informazioniTrapiantoInput');
 
   if (startDate.getFullYear().toString().length > 4 || endDate.getFullYear().toString().length > 4) {
     alert("Anno inserito non valido, inserisci solo 4 cifre");
@@ -376,13 +377,8 @@ function addTask(event) {
       (lastActivity === "Trapianto" && activitySelect.value === "Monitoraggio") ||
       (lastActivity === "Monitoraggio" && activitySelect.value === "Monitoraggio")
     ) {
-      // Verifica se l'attività corrente richiede lo stesso codice trapianto dell'ultima attività
-      if (activitySelect.value !== "Richiesta" && lastTask["Codice Trapianto"] !== codiceTrapiantoInput.value) {
-        alert("L'attività corrente richiede lo stesso codice trapianto dell'ultima attività inserita.");
-        return; // Esce dalla funzione senza aggiungere l'attività
-      }
     } else {
-      alert("L'attività corrente deve seguire sequenzialmente l'ultima attività inserita.");
+      alert("L'attivit&#224; corrente deve seguire sequenzialmente l'ultima attivit&#224; inserita.");
       return; // Esce dalla funzione senza aggiungere l'attività
     }
   }
@@ -411,12 +407,14 @@ function addTask(event) {
   // Aggiorna il grafico di Gantt
   updateGanttChart();
 
+
   // Resetta i campi di input
   startDateInput.value = '';
   endDateInput.value = '';
   idInput.value = '';
   codiceFiscaleInput.value = '';
-  
+  codiceTrapiantoInput.value = ''; 
+
 
 }
 
