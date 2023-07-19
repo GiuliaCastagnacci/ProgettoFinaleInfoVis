@@ -360,6 +360,25 @@ function addTask(event) {
 
   var sequence = ["Richiesta", "Prelievo", "Analisi", "Trapianto", "Monitoraggio"];
 
+  var codiceTrapianto = codiceTrapiantoInput.value.trim();
+
+  // Controllo se il codice di trapianto è già presente nel dataset
+  var isCodiceTrapiantoUsed = data.some(function(task) {
+    return task["Codice Trapianto"] === codiceTrapianto;
+  });
+
+  if (!isCodiceTrapiantoUsed) {
+    // Il codice di trapianto non è presente nel dataset, quindi è possibile aggiungere una nuova attività
+    var firstActivity = sequence[0];
+
+    if (activitySelect.value !== firstActivity) {
+      // L'attività corrente non è la prima attività della sequenza
+      alert("L'attività corrente deve iniziare dalla prima attività della sequenza (" + firstActivity + ").");
+      return;
+    }
+  }
+
+
   if (data.length > 0) {
     var lastTask = data[data.length - 1];
     var lastActivity = lastTask.activity;
@@ -394,6 +413,8 @@ function addTask(event) {
       return;
     }
   }
+
+  
 
   var task = {
     id: idInput.value.trim(),
