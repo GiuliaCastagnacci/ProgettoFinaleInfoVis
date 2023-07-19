@@ -312,7 +312,6 @@ function addTask(event) {
   var idInput = document.getElementById('idInput');
   var codiceTrapiantoInput = document.getElementById('codiceTrapiantoInput');
 
-
   var startDate = new Date(startDateInput.value);
   var endDate = new Date(endDateInput.value);
 
@@ -320,15 +319,14 @@ function addTask(event) {
 
   if (startDate.getFullYear().toString().length > 4 || endDate.getFullYear().toString().length > 4) {
     alert("Anno inserito non valido, inserisci solo 4 cifre");
-    return; // Esce dalla funzione senza aggiungere l'attività
+    return;
   }
 
   if (startDate > endDate) {
     alert("La data di inizio deve essere precedente alla data di fine");
-    return; // Esce dalla funzione senza aggiungere l'attività
+    return;
   }
 
-  // Verifica se lo slot temporale è già occupato per il centro selezionato
   var isSlotOccupied = data.some(function(task) {
     var taskStartDate = new Date(task.startDate);
     var taskEndDate = new Date(task.endDate);
@@ -345,41 +343,45 @@ function addTask(event) {
 
   if (isSlotOccupied) {
     alert("Slot temporale occupato per il centro selezionato");
-    return; // Esce dalla funzione senza aggiungere l'attività
+    return;
   }
 
   var codiceFiscale = codiceFiscaleInput.value.trim();
   if (!isCodiceFiscaleValid(codiceFiscale)) {
-    alert("Il codice fiscale inserito non e' valido.");
-    return; // Esce dalla funzione senza aggiungere l'attività
+    alert("Il codice fiscale inserito non è valido.");
+    return;
   }
-  //if (isCodiceFiscaleAlreadyUsed(codiceFiscale)) {
-  //  alert("Il codice fiscale inserito e' gia' presente in un altro time slot. Inserire un codice fiscale unico.");
-  //  return; // Esce dalla funzione senza aggiungere l'attività
-  //}
 
   var id = idInput.value.trim();
   if (isIdAlreadyUsed(id)) {
-    alert("L'ID inserito e' gia' utilizzato in un altro time slot. Scegliere un ID unico.");
-    return; // Esce dalla funzione senza aggiungere l'attività
+    alert("L'ID inserito è già utilizzato in un altro time slot. Scegliere un ID unico.");
+    return;
   }
 
-  // Verifica se l'attività corrente può essere aggiunta sequenzialmente rispetto all'ultima attività inserita
+  var sequence = ["Richiesta", "Prelievo", "Analisi", "Trapianto", "Monitoraggio"];
+
   if (data.length > 0) {
     var lastTask = data[data.length - 1];
     var lastActivity = lastTask.activity;
 
-    // Verifica se l'attività corrente può essere aggiunta sequenzialmente rispetto all'ultima attività
-    if (
-      (lastActivity === "Richiesta" && activitySelect.value === "Prelievo") ||
-      (lastActivity === "Prelievo" && activitySelect.value === "Analisi") ||
-      (lastActivity === "Analisi" && activitySelect.value === "Trapianto") ||
-      (lastActivity === "Trapianto" && activitySelect.value === "Monitoraggio") ||
-      (lastActivity === "Monitoraggio" && activitySelect.value === "Monitoraggio")
-    ) {
-    } else {
+    var currentActivityIndex = sequence.indexOf(activitySelect.value);
+    var lastActivityIndex = sequence.indexOf(lastActivity);
+
+    if (activitySelect.value === lastActivity) {
+      // L'attività corrente è uguale all'ultima attività presente
+      // Possiamo aggiungere l'attività corrente
+    } else if (currentActivityIndex === lastActivityIndex + 1) {
+      // L'attività corrente è successiva all'ultima attività presente nel flusso sequenziale
+      // Possiamo aggiungere l'attività corrente
+    } else if (currentActivityIndex === lastActivityIndex - 1) {
+      // L'attività corrente è precedente all'ultima attività presente nel flusso sequenziale
+      // Non possiamo aggiungere l'attività corrente
       alert("L'attivit&#224; corrente deve seguire sequenzialmente l'ultima attivit&#224; inserita.");
-      return; // Esce dalla funzione senza aggiungere l'attività
+      return;
+    } else {
+      // L'attività corrente non soddisfa le condizioni per l'inserimento
+      alert("L'attivit&#224; corrente deve seguire sequenzialmente l'ultima attivit&#224; inserita.");
+      return;
     }
   }
 
@@ -392,31 +394,23 @@ function addTask(event) {
     codiceFiscale: codiceFiscale,
     "Codice Trapianto": codiceTrapiantoInput.value.trim()
   };
-  
-
-  var id = parseInt(idInput.value, 10);
-  if (!isNaN(id) && id >= 0 && id < data.length) {
-    // Modifica l'attività esistente
-    data[id] = task;
-  } else {
-    // Aggiungi una nuova attività
-    data.push(task);
-  }
 
   data.push(task);
+
   // Aggiorna il grafico di Gantt
   updateGanttChart();
-
 
   // Resetta i campi di input
   startDateInput.value = '';
   endDateInput.value = '';
   idInput.value = '';
   codiceFiscaleInput.value = '';
-  codiceTrapiantoInput.value = ''; 
-
-
+  codiceTrapiantoInput.value = '';
 }
+
+
+
+
 
 
 function editTask() {

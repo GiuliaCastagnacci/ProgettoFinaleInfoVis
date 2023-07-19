@@ -283,7 +283,7 @@ body {
 }
 
 .bar.highlight {
-  stroke: black; /* Imposta il colore del contorno delle barre evidenziate */
-  stroke-width: 2px; /* Imposta lo spessore del contorno delle barre evidenziate */
+  stroke: black; 
+  stroke-width: 2px; 
 }
 
